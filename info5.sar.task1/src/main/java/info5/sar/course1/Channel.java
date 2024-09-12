@@ -3,8 +3,9 @@ package info5.sar.course1;
 /**
  * A channel is a network abstraction that can read and write bytes.<br>
  * This is an abstract class that represents a channel.<br>
- * A Channel is FIFO (First In First Out) and can be used to send and receive data ~ is bidirectional.<br>
- * There is no data loss in a channel.
+ * A Channel is FIFO (First In First Out) loss less.
+ * <br>
+ * A channel is full duplex, meaning that it can read and write at the same time.
  *
  * @see Broker
  */
@@ -12,6 +13,7 @@ public abstract class Channel {
 
     /**
      * Read up to length bytes from the channel into the given buffer.
+     * <br>
      * This is a blocking operation, it will return only once at least one byte has been read.
      *
      * @param bytes the buffer to read into.
@@ -23,6 +25,7 @@ public abstract class Channel {
 
     /**
      * Write up to length bytes from the given buffer to the channel.
+     * <br>
      * This is a blocking operation, it will return only once all the bytes have been written.
      *
      * @param bytes the buffer to write from.
