@@ -1,5 +1,11 @@
 package info5.sar.course1;
 
+/**
+ * A broker is a network abstraction that can accept incoming connections on a given port and connect to hosts.
+ * This is an abstract class that represents a broker.
+ *
+ * @see Channel
+ */
 public abstract class Broker {
     /**
      * The name of the broker.
@@ -12,7 +18,7 @@ public abstract class Broker {
      *
      * @param name the name of the broker.
      */
-    Broker(String name) {
+    public Broker(String name) {
         this.name = name;
     }
 
@@ -22,7 +28,7 @@ public abstract class Broker {
      * @param port the port to listen on.
      * @return a channel representing the connection.
      */
-    abstract Channel accept(int port);
+    public abstract Channel accept(int port);
 
     /**
      * Connect to a remote host on the given port.
@@ -31,6 +37,6 @@ public abstract class Broker {
      * @param port the port to connect to.
      * @return a channel representing the connection.
      */
-    abstract Channel connect(String host, int port);
+    public abstract Channel connect(String host, int port);
 }
 

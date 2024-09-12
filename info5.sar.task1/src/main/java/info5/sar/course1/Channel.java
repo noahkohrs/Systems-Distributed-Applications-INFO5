@@ -1,5 +1,13 @@
 package info5.sar.course1;
 
+/**
+ * A channel is a network abstraction that can read and write bytes.<br>
+ * This is an abstract class that represents a channel.<br>
+ * A Channel is FIFO (First In First Out) and can be used to send and receive data ~ is bidirectional.<br>
+ * There is no data loss in a channel.
+ *
+ * @see Broker
+ */
 public abstract class Channel {
 
     /**
@@ -11,7 +19,7 @@ public abstract class Channel {
      * @param length the maximum number of bytes to read.
      * @return the number of bytes read, or -1 if the channel is disconnected.
      */
-    abstract int read(byte[] bytes, int offset, int length);
+    public abstract int read(byte[] bytes, int offset, int length);
 
     /**
      * Write up to length bytes from the given buffer to the channel.
@@ -22,18 +30,18 @@ public abstract class Channel {
      * @param length the number of bytes to write.
      * @return the number of bytes written once it succeed and -1 if the channel is disconnected.
      */
-    abstract int write(byte[] bytes, int offset, int length);
+    public abstract int write(byte[] bytes, int offset, int length);
 
     /**
      * Disconnect the channel.
      * Has no effect if the channel is already disconnected.
      */
-    abstract void disconnect();
+    public abstract void disconnect();
 
     /**
      * Check if the channel is disconnected.
      * @return true if the channel is disconnected, false otherwise.
      */
-    abstract boolean disconnected();
+    public abstract boolean disconnected();
 }
 
