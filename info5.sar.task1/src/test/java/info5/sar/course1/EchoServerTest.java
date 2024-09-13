@@ -1,6 +1,6 @@
 package info5.sar.course1;
 
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -10,8 +10,8 @@ class BrokerTest {
     public static int HOST_PORT = 1711;
 
     @SuppressWarnings("InfiniteLoopStatement")
-    @BeforeEach
-    void tearsUp() {
+    @BeforeAll
+    static void tearsUp() {
         var broker = new FillerBroker(HOST_NAME);
         new Task(broker, () -> {
             while (true) {
