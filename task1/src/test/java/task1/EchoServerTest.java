@@ -1,14 +1,10 @@
-package info5.sar.course1;
+package task1;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import task1.Broker;
-import task1.Channel;
-import task1.Task;
-
 import static org.junit.jupiter.api.Assertions.*;
-class BrokerTest {
+class EchoServerTests {
 
     public static String HOST_NAME = "localhost";
     public static int HOST_PORT = 1711;
