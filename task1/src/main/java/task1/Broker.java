@@ -1,4 +1,4 @@
-package info5.sar.course1;
+package task1;
 
 /**
  * A broker is a network abstraction that can accept incoming connections on a given port and connect to hosts.

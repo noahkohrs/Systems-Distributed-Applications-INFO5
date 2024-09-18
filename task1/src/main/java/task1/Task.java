@@ -1,4 +1,4 @@
-package info5.sar.course1;
+package task1;
 
 /**
  * A task is a thread that can be executed by a broker.

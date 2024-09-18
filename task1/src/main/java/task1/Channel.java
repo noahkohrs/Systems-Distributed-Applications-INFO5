@@ -1,4 +1,4 @@
-package info5.sar.course1;
+package task1;
 
 /**
  * A channel is a network abstraction that can read and write bytes.<br>
