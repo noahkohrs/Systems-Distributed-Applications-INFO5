@@ -31,9 +31,10 @@ public abstract class Broker {
      * This is a blocking operation, it will return only once a connection has been accepted.
      *
      * @param port the port to listen on.
-     * @return a channel representing the connection and null if the connection failed.
+     * @return a channel representing the connection.
+     * @throws AlreadyInUseException if the port is already in use.
      */
-    public abstract Channel accept(int port) throws DisconnectedException;
+    public abstract Channel accept(int port) throws AlreadyInUseException;
 
     /**
      * Connect to a remote host on the given port.
@@ -42,8 +43,9 @@ public abstract class Broker {
      *
      * @param host the host to connect to.
      * @param port the port to connect to.
-     * @return a channel representing the connection to the remote host and null if the connection failed.
+     * @return a channel representing the connection to the remote host.
+     * @throws AlreadyInUseException if the port is already in use.
      */
-    public abstract Channel connect(String host, int port) throws DisconnectedException;
+    public abstract Channel connect(String host, int port) throws AlreadyInUseException;
 }
 
