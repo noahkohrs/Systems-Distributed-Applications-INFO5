@@ -1,4 +1,4 @@
-package task1;
+package task1.exceptions;
 
 public class AlreadyInUseException extends Exception{
     public AlreadyInUseException(String name) {

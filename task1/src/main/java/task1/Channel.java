@@ -1,5 +1,7 @@
 package task1;
 
+import task1.exceptions.DisconnectedException;
+
 /**
  * A channel is a network abstraction that can read and write bytes.<br>
  * This is an abstract class that represents a channel.<br>

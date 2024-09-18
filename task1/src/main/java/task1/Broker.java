@@ -1,5 +1,7 @@
 package task1;
 
+import task1.exceptions.AlreadyInUseException;
+
 /**
  * A broker is a network abstraction that can accept incoming connections on a given port and connect to hosts.
  * This is an abstract class that represents a broker.

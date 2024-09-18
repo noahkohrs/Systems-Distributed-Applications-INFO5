@@ -1,5 +1,7 @@
 package task1;
 
+import task1.exceptions.NotATaskException;
+
 /**
  * A task is a thread that can be executed by a broker.
  *
