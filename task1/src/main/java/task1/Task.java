@@ -22,13 +22,14 @@ public class Task extends Thread {
     /**
      * Get the broker that this task is associated with.
      *
-     * @return the broker that this task is associated with if the current thread is a task, null otherwise.
+     * @return the broker that this task is associated with if the current thread is a task.
+     * @throws NotATaskException if the current thread is not a task.
      */
-    public static Broker getBroker() {
+    public static Broker getBroker() throws NotATaskException {
         try {
             return ((Task) Thread.currentThread()).broker;
         } catch (ClassCastException e) {
-            return null;
+            throw new NotATaskException(Thread.currentThread());
         }
     }
 }

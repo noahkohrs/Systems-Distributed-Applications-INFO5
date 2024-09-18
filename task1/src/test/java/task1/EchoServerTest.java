@@ -21,13 +21,17 @@ class EchoServerTests {
                     new Task(broker, () -> {
                         byte[] buffer = new byte[1024];
                         while (true) {
-                            int read = channel.read(buffer, 0, buffer.length);
-                            if (read == -1) {
+                            int read = 0;
+                            try {
+                                read = channel.read(buffer, 0, buffer.length);
+                            } catch (DisconnectedException e) {
                                 channel.disconnect();
                                 return;
                             }
-                            int write = channel.write(buffer, 0, read);
-                            if (write == -1) {
+                            int write = 0;
+                            try {
+                                write = channel.write(buffer, 0, read);
+                            } catch (DisconnectedException e) {
                                 channel.disconnect();
                                 return;
                             }
@@ -45,9 +49,18 @@ class EchoServerTests {
         var channel = broker.connect(HOST_NAME, HOST_PORT);
         for (int i = 1; i <= 255; i++) {
             byte[] buffer = new byte[]{(byte) i};
-            channel.write(buffer, 0, buffer.length);
+            try {
+                channel.write(buffer, 0, buffer.length);
+            } catch (DisconnectedException e) {
+                fail("Channel disconnected");
+            }
             byte[] readBuffer = new byte[1];
-            int read = channel.read(readBuffer, 0, 1);
+            int read = 0;
+            try {
+                read = channel.read(readBuffer, 0, 1);
+            } catch (DisconnectedException e) {
+                fail("Channel disconnected");
+            }
             assertEquals(1, read);
             assertEquals(i, readBuffer[0]);
         }

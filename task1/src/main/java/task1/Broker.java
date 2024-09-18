@@ -33,7 +33,7 @@ public abstract class Broker {
      * @param port the port to listen on.
      * @return a channel representing the connection and null if the connection failed.
      */
-    public abstract Channel accept(int port);
+    public abstract Channel accept(int port) throws DisconnectedException;
 
     /**
      * Connect to a remote host on the given port.
@@ -44,6 +44,6 @@ public abstract class Broker {
      * @param port the port to connect to.
      * @return a channel representing the connection to the remote host and null if the connection failed.
      */
-    public abstract Channel connect(String host, int port);
+    public abstract Channel connect(String host, int port) throws DisconnectedException;
 }
 
