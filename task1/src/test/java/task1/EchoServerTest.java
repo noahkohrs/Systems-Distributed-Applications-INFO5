@@ -2,7 +2,9 @@ package task1;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import task1.exceptions.ConnectionFailedException;
 import task1.exceptions.DisconnectedException;
+import task1.impl.LocalBroker;
 
 import static org.junit.jupiter.api.Assertions.*;
 class EchoServerTests {
@@ -12,31 +14,30 @@ class EchoServerTests {
 
     @BeforeAll
     static void tearsUp() {
-        var broker = new FillerBroker(HOST_NAME);
+        var broker = new LocalBroker(HOST_NAME);
         new Task(broker, () -> {
             while (true) {
                 // Accept incoming connections.
-                Channel channel = broker.accept(HOST_PORT);
+                Channel channel = null;
+                try {
+                    channel = broker.accept(HOST_PORT);
+                } catch (ConnectionFailedException e) {
+                    fail("Connection failed");
+                }
                 if (channel != null) {
                     // Echo the received data until it is disconnected.
+                    Channel finalChannel = channel;
                     new Task(broker, () -> {
-                        byte[] buffer = new byte[1024];
+                        byte[] buffer = new byte[1];
                         while (true) {
-                            int read = 0;
                             try {
-                                read = channel.read(buffer, 0, buffer.length);
+                                int read = finalChannel.read(buffer, 0, buffer.length);
+                                int write = finalChannel.write(buffer, 0, read);
+                                assertEquals(read, write);
                             } catch (DisconnectedException e) {
-                                channel.disconnect();
+                                finalChannel.disconnect();
                                 return;
                             }
-                            int write = 0;
-                            try {
-                                write = channel.write(buffer, 0, read);
-                            } catch (DisconnectedException e) {
-                                channel.disconnect();
-                                return;
-                            }
-                            System.out.print(new String(buffer, 0, read));
                         }
                     }).start();
                 }
@@ -46,44 +47,26 @@ class EchoServerTests {
 
     @Test
     void simpleTestClient() {
-        var broker = new FillerBroker("client");
-        var channel = broker.connect(HOST_NAME, HOST_PORT);
-        for (int i = 1; i <= 255; i++) {
+        var broker = new LocalBroker("client");
+        Channel channel = null;
+        try {
+            channel = broker.connect(HOST_NAME, HOST_PORT);
+        } catch (ConnectionFailedException e) {
+            fail("Connection failed");
+        }
+        byte[] readBuffer = new byte[1];
+        for (int i = 0; i <= 255; i++) {
             byte[] buffer = new byte[]{(byte) i};
             try {
-                channel.write(buffer, 0, buffer.length);
+                int write = channel.write(buffer, 0, buffer.length);
+                assertEquals(write, 1);
+                int read = channel.read(readBuffer, 0, 1);
+                assertEquals(1, read);
+                assertEquals(buffer[0], readBuffer[0]);
             } catch (DisconnectedException e) {
                 fail("Channel disconnected");
             }
-            byte[] readBuffer = new byte[1];
-            int read = 0;
-            try {
-                read = channel.read(readBuffer, 0, 1);
-            } catch (DisconnectedException e) {
-                fail("Channel disconnected");
-            }
-            assertEquals(1, read);
-            assertEquals(i, readBuffer[0]);
         }
         channel.disconnect();
-    }
-}
-
-/**
- * Should be replaced by the real implementation of the broker once it's ready.
- */
-class FillerBroker extends Broker {
-    public FillerBroker(String name) {
-        super(name);
-    }
-
-    @Override
-    public Channel accept(int port) {
-        return null;
-    }
-
-    @Override
-    public Channel connect(String host, int port) {
-        return null;
     }
 }
