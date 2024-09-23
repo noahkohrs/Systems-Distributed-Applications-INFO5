@@ -7,16 +7,10 @@ public class ConnectionFailedException extends Exception{
         PORT_IN_USE_FOR_THIS_BROKER,
     }
 	public ConnectionFailedException(Issue issue, String val) {
-        switch (issue) {
-            case NAME_IN_USE:
-                System.out.println("Broker with name " + val + " already exists.");
-                break;
-            case NO_BROKER_WITH_NAME:
-                System.out.println("No broker with name " + val);
-                break;
-            case PORT_IN_USE_FOR_THIS_BROKER:
-                System.out.println("Port " + val + " is already in use for this broker.");
-                break;
-        }
+        super(switch (issue) {
+            case NAME_IN_USE -> "Name " + val + " is already in use";
+            case NO_BROKER_WITH_NAME -> "No broker with name " + val;
+            case PORT_IN_USE_FOR_THIS_BROKER -> "Port " + val + " is already in use for this broker";
+        });
     }
 }
