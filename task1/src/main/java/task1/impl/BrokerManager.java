@@ -1,7 +1,5 @@
 package task1.impl;
 
-import task1.Broker;
-
 import java.util.HashSet;
 import java.util.Set;
 
