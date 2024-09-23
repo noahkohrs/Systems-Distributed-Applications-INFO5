@@ -1,6 +1,6 @@
 package task1;
 
-import task1.exceptions.AlreadyInUseException;
+import task1.exceptions.ConnectionFailedException;
 
 /**
  * A broker is a network abstraction that can accept incoming connections on a given port and connect to hosts.
@@ -34,9 +34,9 @@ public abstract class Broker {
      *
      * @param port the port to listen on.
      * @return a channel representing the connection.
-     * @throws AlreadyInUseException if the port is already in use.
+     * @throws ConnectionFailedException if the connection could not be established (check if the port is already in use)
      */
-    public abstract Channel accept(int port) throws AlreadyInUseException;
+    public abstract Channel accept(int port) throws ConnectionFailedException;
 
     /**
      * Connect to a remote host on the given port.
@@ -46,8 +46,8 @@ public abstract class Broker {
      * @param host the host to connect to.
      * @param port the port to connect to.
      * @return a channel representing the connection to the remote host.
-     * @throws AlreadyInUseException if the port is already in use.
+     * @throws ConnectionFailedException if the connection with the host could not be established.
      */
-    public abstract Channel connect(String host, int port) throws AlreadyInUseException;
+    public abstract Channel connect(String host, int port) throws ConnectionFailedException;
 }
 
