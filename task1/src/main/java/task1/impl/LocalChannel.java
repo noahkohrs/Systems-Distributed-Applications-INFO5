@@ -1,6 +1,6 @@
 package task1.impl;
 
-import org.apache.commons.io.input.buffer.CircularByteBuffer;
+import info5.sar.utils.CircularBuffer;
 import task1.Channel;
 import task1.exceptions.DisconnectedException;
 
@@ -20,7 +20,7 @@ public class LocalChannel extends Channel {
      */
     final String brokerName;
 
-    CircularByteBuffer data = new CircularByteBuffer(1024);
+    CircularBuffer data = new CircularBuffer(1024);
 
     public LocalChannel(String brokerName) {
         super();
@@ -29,7 +29,7 @@ public class LocalChannel extends Channel {
 
     @Override
     public synchronized int read(byte[] bytes, int offset, int length) throws DisconnectedException {
-        while (data.getCurrentNumberOfBytes() == 0) {
+        while (data.empty()) {
             if (!connected) {
                 throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
             } else {
@@ -41,8 +41,11 @@ public class LocalChannel extends Channel {
                 }
             }
         }
-        var bytesRead = Math.min(data.getCurrentNumberOfBytes(), length);
-        data.read(bytes, offset, bytesRead);
+        var bytesRead = 0;
+        while (!data.empty() && bytesRead < length) {
+            bytes[offset + bytesRead] = data.pull();
+            bytesRead++;
+        }
         synchronized (oppositeGateway) {
             oppositeGateway.notifyAll();  // Notify writers waiting for space
         }
@@ -55,7 +58,7 @@ public class LocalChannel extends Channel {
             throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
         }
         var data = oppositeGateway.data;
-        while (data.getSpace() == 0) {
+        while (data.full()) {
             try {
                 wait();
             } catch (InterruptedException e) {
@@ -63,8 +66,11 @@ public class LocalChannel extends Channel {
                 throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
             }
         }
-        var spaceToWrite = Math.min(data.getSpace(), length);
-        data.add(bytes, offset, spaceToWrite);
+        var spaceToWrite = 0;
+        while (!data.full() && spaceToWrite < length) {
+            data.push(bytes[offset + spaceToWrite]);
+            spaceToWrite++;
+        }
         synchronized (oppositeGateway) {
             oppositeGateway.notifyAll();  // Notify readers waiting for data
         }
