@@ -3,12 +3,16 @@ package task1.impl;
 import task1.Broker;
 import task1.Channel;
 
-public class RendezVous {
+import java.util.concurrent.Semaphore;
+
+class RendezVous {
 
     Broker acceptor;
     Broker connector;
     LocalChannel channelForAcceptor;
     LocalChannel channelForConnector;
+    Semaphore accept = new Semaphore(0);
+    Semaphore connect = new Semaphore(0);
 
     private synchronized void createChannels() {
         if (channelForConnector == null && channelForAcceptor == null) {
@@ -22,39 +26,42 @@ public class RendezVous {
         }
     }
 
-    synchronized Channel connect(LocalBroker b) {
-           connector = b;
-           if (acceptor == null) {
-               // Wait for the other broker to connect
-               try {
-                   wait();
-               } catch (InterruptedException e) {
-                   throw new RuntimeException(e);
-               }
-           }
-           createChannels();
-           notify();
-           return channelForConnector;
+    void connect(LocalBroker b) {
+        if (connector != null) {
+            throw new IllegalStateException("connector is already set");
+        }
+       connector = b;
     }
 
-    synchronized Channel accept(LocalBroker b) {
-            acceptor = b;
-            if (connector == null) {
-                // Wait for the other broker to connect
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            createChannels();
-            notify();
-            return channelForAcceptor;
+    Channel getChannelForConnector() throws InterruptedException {
+        accept.release();
+        connect.acquire();
+        createChannels();
+
+        return channelForConnector;
+    }
+
+    void accept(LocalBroker b) {
+        if (acceptor != null) {
+            throw new IllegalStateException("acceptor is already set");
+        }
+        acceptor = b;
+
+
+    }
+
+    Channel getChannelForAcceptor() throws InterruptedException {
+        connect.release();
+        accept.acquire();
+        createChannels();
+
+        return channelForAcceptor;
     }
     boolean isWaitingForAccept() {
-        return connector == null;
-    }
-    boolean isWaitingForConnect() {
         return acceptor == null;
+    }
+
+    boolean isWaitingForConnect() {
+        return connector == null;
     }
 }
