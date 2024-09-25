@@ -5,8 +5,6 @@ import task1.exceptions.ConnectionFailedException;
 import task1.exceptions.DisconnectedException;
 import task1.impl.LocalBroker;
 
-import java.util.Arrays;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 class EchoServerTests {
