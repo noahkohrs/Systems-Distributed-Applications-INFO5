@@ -44,6 +44,12 @@ class EchoServerTests {
         }
     };
 
+    @AfterAll
+    static void tearDown() {
+        ((LocalBroker)server).delete();
+        ((LocalBroker)client).delete();
+    }
+
     @BeforeAll
     static void tearsUp() {
         new Task(server, EchoServerTests::echo).start();

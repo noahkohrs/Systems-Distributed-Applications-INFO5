@@ -16,7 +16,7 @@ public class LocalBroker extends Broker {
     final Map<Integer, RendezVous> rdvs;
 
     Semaphore host = new Semaphore(1);
-    Semaphore connector = new Semaphore(0);
+    Semaphore connector = new Semaphore(0, true);
 
     public LocalBroker(String name) {
         super(name);
@@ -52,7 +52,11 @@ public class LocalBroker extends Broker {
     public Channel connect(String host, int port) throws ConnectionFailedException {
         LocalBroker hostBroker;
         try {
-            hostBroker = BrokerManager.getBroker(host);
+            var broker = BrokerManager.getBroker(host);
+            if (!(broker instanceof LocalBroker)) {
+                throw new IllegalArgumentException();
+            }
+            hostBroker = (LocalBroker) broker;
         } catch (IllegalArgumentException e) {
             throw new ConnectionFailedException(ConnectionFailedException.Issue.NO_BROKER_WITH_NAME, host);
         }
@@ -67,6 +71,6 @@ public class LocalBroker extends Broker {
     }
 
     public void delete() {
-        BrokerManager.removeBroker(this);
+        BrokerManager.removeBroker(this.name);
     }
 }

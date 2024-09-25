@@ -48,6 +48,9 @@ public class LocalChannelTest {
             }
 
             assertThrows(DisconnectedException.class, () -> channel.read(new byte[1], 0, 1));
+
+            server.delete();
+            client.delete();
         }
 
         @Test
@@ -73,6 +76,9 @@ public class LocalChannelTest {
                 throw new RuntimeException(e);
             }
             assertThrows(DisconnectedException.class, () -> channel.read(new byte[1], 0, 1));
+
+            server.delete();
+            client.delete();
         }
     }
 }

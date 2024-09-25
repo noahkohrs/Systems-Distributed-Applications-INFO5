@@ -39,6 +39,9 @@ public class RendezVousTest {
         } catch (InterruptedException e) {
             fail("Interrupted with " + e.getStackTrace());
         }
+
+        acceptor.delete();
+        connector.delete();
     }
 
     @Test
@@ -73,5 +76,8 @@ public class RendezVousTest {
         } catch (InterruptedException e) {
             fail("Interrupted with " + e.getStackTrace());
         }
+
+        acceptor.delete();
+        connector.delete();
     }
 }

@@ -42,6 +42,9 @@ public class LocalBrokerTest {
         } catch (InterruptedException e) {
             fail("Interrupted with " + e.getStackTrace());
         }
+
+        connector.delete();
+        acceptor.delete();
     }
 
     @RepeatedTest(100)
@@ -74,5 +77,8 @@ public class LocalBrokerTest {
         } catch (InterruptedException e) {
             fail("Interrupted with " + e.getStackTrace());
         }
+
+        connector.delete();
+        acceptor.delete();
     }
 }
