@@ -42,9 +42,10 @@ public abstract class Channel {
     /**
      * Disconnect the channel.
      * Has no effect if the channel is already disconnected.
-     *
-     * Only takes effect after all the pending read and write operations have completed.
-     *
+     * <br>
+     * Interrupts any ongoing read or write operations.
+     * <br>
+     * The opposite side of the channel will still be able to read any remaining data while the instance calling the function will not be able to read or write any more data.
      */
     public abstract void disconnect();
 

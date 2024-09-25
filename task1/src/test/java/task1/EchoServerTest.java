@@ -7,7 +7,7 @@ import task1.impl.LocalBroker;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EchoServerTests {
+class EchoServerTest {
 
     static final String HOST_NAME = "server";
     static final String CLIENT_NAME = "client";
@@ -50,11 +50,11 @@ class EchoServerTests {
 
     @BeforeAll
     static void tearsUp() {
-        new Task(server, EchoServerTests::echo).start();
+        new Task(server, EchoServerTest::echo).start();
     }
 
     @Nested
-    class SimpleTests {
+    class LimitTests {
 
         static final int NUMBER_OF_SIMULTANEOUS_CONNECTIONS = 120;
 
