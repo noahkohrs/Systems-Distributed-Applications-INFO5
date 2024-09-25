@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component LANGUAGE_LEVEL="JDK_21" inherit-compiler-output="true" inheritJdk="true">
+	<contentEntry url="file://$MODULE_DIR$/task1">
+		<excludeFolder url="file://$MODULE_DIR$/task1/.gradle"/>
+		<excludeFolder url="file://$MODULE_DIR$/task1/build"/>
+	</contentEntry>
+</component>
