@@ -1,7 +1,5 @@
 package task1;
 
-import task1.exceptions.NotATaskException;
-
 /**
  * A task is a thread that can be executed by a broker.
  *
@@ -25,13 +23,13 @@ public class Task extends Thread {
      * Get the broker that this task is associated with.
      *
      * @return the broker that this task is associated with if the current thread is a task.
-     * @throws NotATaskException if the current thread is not a task.
+     * @throws IllegalStateException if the current thread is not a task.
      */
-    public static Broker getBroker() throws NotATaskException {
-        try {
-            return ((Task) Thread.currentThread()).broker;
-        } catch (ClassCastException e) {
-            throw new NotATaskException(Thread.currentThread());
+    public static Broker getBroker() throws IllegalStateException {
+        var currentThread = Thread.currentThread();
+        if (currentThread instanceof Task) {
+            return ((Task) currentThread).broker;
         }
+        throw new IllegalStateException("The current thread is not a task");
     }
 }

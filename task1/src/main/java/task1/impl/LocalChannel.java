@@ -29,8 +29,11 @@ public class LocalChannel extends Channel {
 
     @Override
     public synchronized int read(byte[] bytes, int offset, int length) throws DisconnectedException {
+        if (!this.connected) {
+            throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
+        }
         while (data.empty()) {
-            if (!connected) {
+            if (!this.connected || !oppositeGateway.connected) {
                 throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
             } else {
                 try {
@@ -54,12 +57,15 @@ public class LocalChannel extends Channel {
 
     @Override
     public int write(byte[] bytes, int offset, int length) throws DisconnectedException {
-        if (!connected) {
+        if (!this.connected || !oppositeGateway.connected){
             throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
         }
         var data = oppositeGateway.data;
         while (data.full()) {
             try {
+                if (!this.connected || !oppositeGateway.connected){
+                    throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
+                }
                 wait();
             } catch (InterruptedException e) {
                 disconnect();
@@ -84,7 +90,6 @@ public class LocalChannel extends Channel {
             return;
         }
         connected = false;
-        oppositeGateway.connected = false;
         notifyAll();
         synchronized (oppositeGateway) {
             oppositeGateway.notifyAll();
@@ -93,6 +98,6 @@ public class LocalChannel extends Channel {
 
     @Override
     public boolean disconnected() {
-        return !connected;
+        return !connected || !oppositeGateway.connected;
     }
 }
