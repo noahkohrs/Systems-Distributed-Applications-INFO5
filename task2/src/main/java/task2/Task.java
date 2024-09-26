@@ -2,6 +2,11 @@ package task2;
 
 import task1.Broker;
 
+/**
+ * A {@link Task} is a thread which is associated with a {@link QueueBroker}.
+ *
+ * @see MessageQueue
+ */
 public abstract class Task extends task1.Task {
 
     private final QueueBroker queueBroker;
