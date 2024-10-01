@@ -7,7 +7,7 @@ import task1.Broker;
  *
  * @see MessageQueue
  */
-public abstract class Task extends task1.Task {
+public class Task extends task1.Task {
 
     private final QueueBroker queueBroker;
 
