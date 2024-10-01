@@ -99,7 +99,7 @@ class EchoServerTest {
         }
     }
 
-    @Test
+    @RepeatedTest(100)
     void defaultTest() {
         Channel channel = null;
         try {

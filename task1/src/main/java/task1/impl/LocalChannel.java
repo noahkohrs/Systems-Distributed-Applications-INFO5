@@ -85,12 +85,14 @@ public class LocalChannel extends Channel {
 
 
     @Override
-    public synchronized void disconnect() {
-        if (!connected) {
-            return;
+    public void disconnect() {
+        synchronized (this) {
+            if (!connected) {
+                return;
+            }
+            connected = false;
+            notifyAll();
         }
-        connected = false;
-        notifyAll();
         synchronized (oppositeGateway) {
             oppositeGateway.notifyAll();
         }
