@@ -12,16 +12,16 @@ public class LocalQueueBroker extends QueueBroker {
 
     @Override
     public String name() {
-        return "";
+        return broker.name;
     }
 
     @Override
     public MessageQueue accept(int port) throws ConnectionFailedException {
-        return null;
+        return new LocalMessageQueue(broker.accept(port));
     }
 
     @Override
     public MessageQueue connect(String name, int port) throws ConnectionFailedException {
-        return null;
+        return new LocalMessageQueue(broker.connect(name, port));
     }
 }

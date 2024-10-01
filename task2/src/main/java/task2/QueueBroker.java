@@ -10,7 +10,7 @@ import task1.exceptions.ConnectionFailedException;
  */
 public abstract class QueueBroker {
 
-    final Broker broker;
+    public final Broker broker;
 
     public QueueBroker(Broker broker) {
         this.broker = broker;
