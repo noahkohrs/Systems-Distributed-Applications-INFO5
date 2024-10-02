@@ -33,7 +33,7 @@ public class LocalMessageQueue extends MessageQueue {
 
             var index = 0;
             while (index < length) {
-                index += channel.write(bytes, offset + index, length);
+                index += channel.write(bytes, offset + index, length - index);
             }
 
         } catch (InterruptedException e) {
@@ -57,7 +57,7 @@ public class LocalMessageQueue extends MessageQueue {
             var bytes = new byte[length];
             var index = 0;
             while (index < length) {
-                index += channel.read(bytes, index, length);
+                index += channel.read(bytes, index, length-index);
             }
             return bytes;
         } catch (InterruptedException e) {
