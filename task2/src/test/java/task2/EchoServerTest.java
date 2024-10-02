@@ -1,6 +1,7 @@
 package task2;
 
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task1.exceptions.ConnectionFailedException;
@@ -21,17 +22,11 @@ public class EchoServerTest extends TitiTotoTesting {
         "s"
     };
 
-    @BeforeEach
-    void setup() {
-        var echoServer = new Task(toto, this::multiEchoServer);
+    @BeforeAll
+    static void setup() {
+        var echoServer = new Task(toto, EchoServerTest::multiEchoServer);
         echoServer.start();
     }
-
-    @AfterEach
-    void tearDown() {
-        ((LocalBroker) toto.broker).delete();
-    }
-
 
     @Test
     void sendingBunchOfDataToTheEchoServer() {
@@ -67,7 +62,7 @@ public class EchoServerTest extends TitiTotoTesting {
         }
     }
 
-    public void multiEchoServer() {
+    public static void multiEchoServer() {
         var queueBroker = Task.getQueueBroker();
         while (true) {
             try {
@@ -79,7 +74,7 @@ public class EchoServerTest extends TitiTotoTesting {
         }
     }
 
-    public void echoServer(MessageQueue messageQueue) {
+    public static void echoServer(MessageQueue messageQueue) {
         try {
             while (!messageQueue.closed()) {
                 var message = messageQueue.receive();
