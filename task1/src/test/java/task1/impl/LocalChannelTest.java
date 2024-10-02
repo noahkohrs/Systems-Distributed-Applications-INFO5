@@ -15,7 +15,51 @@ public class LocalChannelTest {
 
     @Nested
     class BasicTests {
+        LocalBroker server;
+        LocalBroker client;
 
+        @BeforeEach
+        void setUp() {
+            server = new LocalBroker("server");
+            client = new LocalBroker("client");
+        }
+
+        @AfterEach
+        void tearDown() {
+            server.delete();
+            client.delete();
+        }
+
+        @Test
+        void sendingHugeAmountOfData() {
+            var sender = new Task(server, () -> {
+                try {
+                    byte[] bytes = new byte[1025];
+                    var channel = server.accept(4242);
+                    Thread.sleep(200);
+                    int index = 0;
+                    while (index < 1025) {
+                        index+=channel.read(bytes, index, bytes.length - index);
+                    }
+                } catch (ConnectionFailedException | InterruptedException | DisconnectedException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+
+
+            sender.start();
+            Channel channel;
+            byte[] bytes  = new byte[1025];
+            bytes[1024] = 5;
+            try {
+                channel = client.connect("server", 4242);
+                channel.write(bytes,0, 1025);
+                channel.write(bytes, 1024, 1);
+            } catch (DisconnectedException | ConnectionFailedException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
     }
 
     @Nested
@@ -38,7 +82,7 @@ public class LocalChannelTest {
 
         @Test
         void disconnectWhileBufferStillHasToRead() {
-            var sender = new Task(server, () -> {
+            var sender = new Task(client, () -> {
                 try {
                     var channel = client.accept(666);
                     channel.write(new byte[] {1}, 0, 1);
