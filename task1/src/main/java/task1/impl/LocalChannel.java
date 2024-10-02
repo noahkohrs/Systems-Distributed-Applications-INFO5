@@ -8,7 +8,7 @@ public class LocalChannel extends Channel {
     /**
      * Whether the channel is connected.
      */
-    boolean connected = true;
+    volatile boolean connected = true;
 
     /**
      * The opposite channel side.
@@ -28,59 +28,69 @@ public class LocalChannel extends Channel {
     }
 
     @Override
-    public synchronized int read(byte[] bytes, int offset, int length) throws DisconnectedException {
-        if (!this.connected) {
-            throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
-        }
-        while (data.empty()) {
-            if (!this.connected || !oppositeGateway.connected) {
-                throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
-            } else {
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    disconnect();
-                    throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
+    public int read(byte[] bytes, int offset, int length) throws DisconnectedException {
+        try {
+            synchronized (this) {
+                if (!this.connected) {
+                    throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
                 }
+                while (data.empty()) {
+                    if (!this.connected || !oppositeGateway.connected) {
+                        throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
+                    } else {
+                        try {
+                            wait();
+                        } catch (InterruptedException e) {
+                            disconnect();
+                            throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
+                        }
+                    }
+                }
+                var bytesRead = 0;
+                while (!data.empty() && bytesRead < length) {
+                    bytes[offset + bytesRead] = data.pull();
+                    bytesRead++;
+                }
+                return bytesRead; // Return the number of bytes read
+            }
+        } finally {
+            synchronized (oppositeGateway) {
+                oppositeGateway.notifyAll();  // Notify writers waiting for space
             }
         }
-        var bytesRead = 0;
-        while (!data.empty() && bytesRead < length) {
-            bytes[offset + bytesRead] = data.pull();
-            bytesRead++;
-        }
-        synchronized (oppositeGateway) {
-            oppositeGateway.notifyAll();  // Notify writers waiting for space
-        }
-        return bytesRead; // Return the number of bytes read
     }
 
     @Override
     public int write(byte[] bytes, int offset, int length) throws DisconnectedException {
-        if (!this.connected || !oppositeGateway.connected){
-            throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
-        }
-        var data = oppositeGateway.data;
-        while (data.full()) {
-            try {
-                if (!this.connected || !oppositeGateway.connected){
+        try {
+            synchronized (this) {
+                if (!this.connected || !oppositeGateway.connected) {
                     throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
                 }
-                wait();
-            } catch (InterruptedException e) {
-                disconnect();
-                throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
+                var data = oppositeGateway.data;
+                while (data.full()) {
+                    try {
+                        if (!this.connected || !oppositeGateway.connected) {
+                            throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
+                        }
+                        wait();
+                    } catch (InterruptedException e) {
+                        disconnect();
+                        throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
+                    }
+                }
+                var spaceToWrite = 0;
+                while (!data.full() && spaceToWrite < length) {
+                    data.push(bytes[offset + spaceToWrite]);
+                    spaceToWrite++;
+                }
+                return spaceToWrite; // Return the number of bytes written
+            }
+        } finally {
+            synchronized (oppositeGateway) {
+                oppositeGateway.notifyAll();  // Notify readers waiting for data
             }
         }
-        var spaceToWrite = 0;
-        while (!data.full() && spaceToWrite < length) {
-            data.push(bytes[offset + spaceToWrite]);
-            spaceToWrite++;
-        }
-        synchronized (oppositeGateway) {
-            oppositeGateway.notifyAll();  // Notify readers waiting for data
-        }
-        return spaceToWrite; // Return the number of bytes written
     }
 
 
