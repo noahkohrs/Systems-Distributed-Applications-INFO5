@@ -1,12 +1,9 @@
 package task2;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task1.exceptions.ConnectionFailedException;
 import task1.exceptions.DisconnectedException;
-import task1.impl.LocalBroker;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.fail;

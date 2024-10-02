@@ -3,9 +3,6 @@ package task2.impl;
 import task1.Channel;
 import task1.exceptions.DisconnectedException;
 import task2.MessageQueue;
-
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.Semaphore;
 
 public class LocalMessageQueue extends MessageQueue {
