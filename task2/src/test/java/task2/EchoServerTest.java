@@ -1,8 +1,11 @@
 package task2;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task1.exceptions.ConnectionFailedException;
 import task1.exceptions.DisconnectedException;
+import task1.impl.LocalBroker;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -18,16 +21,27 @@ public class EchoServerTest extends TitiTotoTesting {
         "s"
     };
 
+    @BeforeEach
+    void setup() {
+        var echoServer = new Task(toto, this::multiEchoServer);
+        echoServer.start();
+    }
+
+    @AfterEach
+    void tearDown() {
+        ((LocalBroker) toto.broker).delete();
+    }
+
+
     @Test
     void sendingBunchOfDataToTheEchoServer() {
-        var echoServer = new Task(toto, this::echoServer);
-        echoServer.start();
         try {
             var msgQueue = titi.connect("toto", 0);
             for (var testString : testStrings) {
                 var message = testString.getBytes();
                 msgQueue.send(message, 0, message.length);
                 var received = msgQueue.receive();
+                assertArrayEquals(message, received);
                 assertArrayEquals(message, received);
             }
         } catch (ConnectionFailedException e) {
@@ -37,25 +51,42 @@ public class EchoServerTest extends TitiTotoTesting {
         }
     }
 
-    public void multiEchoServer() {
-        var queueBroker = Task.getQueueBroker();
-        while (true) {
-            new Task(queueBroker, this::echoServer).start();
+    @Test
+    void sendingHugeMessage() {
+        byte[] msg = new byte[160000];
+        try {
+            var msgQueue = titi.connect("toto", 0);
+            msgQueue.send(msg, 0, msg.length);
+            var received = msgQueue.receive();
+
+
+        } catch (ConnectionFailedException e) {
+        fail("Brokers exists, the connection should be successful", e);
+        } catch (DisconnectedException e) {
+            fail("The echo server should not be disconnected", e);
         }
     }
 
-
-    public void echoServer() {
+    public void multiEchoServer() {
         var queueBroker = Task.getQueueBroker();
+        while (true) {
+            try {
+                var messageQueue = queueBroker.accept(0);
+                new Task(queueBroker, () -> echoServer(messageQueue)).start();
+            } catch (ConnectionFailedException e) {
+                fail();
+            }
+        }
+    }
+
+    public void echoServer(MessageQueue messageQueue) {
         try {
-            var messageQueue = queueBroker.accept(0);
             while (!messageQueue.closed()) {
                 var message = messageQueue.receive();
                 messageQueue.send(message, 0, message.length);
             }
-        } catch (ConnectionFailedException | DisconnectedException e) {
+        } catch (DisconnectedException e) {
             throw new RuntimeException(e);
         }
-
     }
 }
