@@ -25,7 +25,7 @@ public class LocalMessageQueue extends MessageQueue {
 
             var lengthIndex = 0;
             while (lengthIndex < 4) {
-                lengthIndex += channel.write(lengthBytes, lengthIndex, 4);
+                lengthIndex += channel.write(lengthBytes, lengthIndex, 4 - lengthIndex);
             }
 
             var index = 0;
