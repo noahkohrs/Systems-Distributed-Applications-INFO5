@@ -10,10 +10,13 @@ repositories {
 }
 
 dependencies {
+    implementation(project(':task1'))
+
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }
 
 test {
     useJUnitPlatform()
+    outputs.upToDateWhen {false}
 }
