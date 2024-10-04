@@ -21,4 +21,24 @@ public class EventMessage {
     public EventMessage(byte[] bytes) {
         this(bytes, 0, bytes.length);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (!(obj instanceof EventMessage)) {
+            return false;
+        }
+        EventMessage other = (EventMessage) obj;
+        if (bytes.length != other.bytes.length) {
+            return false;
+        }
+        for (int i = 0; i < bytes.length; i++) {
+            if (bytes[i] != other.bytes[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 }
