@@ -27,10 +27,9 @@ public class EventMessage {
         if (obj == this) {
             return true;
         }
-        if (!(obj instanceof EventMessage)) {
+        if (!(obj instanceof EventMessage other)) {
             return false;
         }
-        EventMessage other = (EventMessage) obj;
         if (bytes.length != other.bytes.length) {
             return false;
         }
