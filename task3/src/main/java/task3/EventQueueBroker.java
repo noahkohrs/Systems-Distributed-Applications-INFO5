@@ -1,7 +1,7 @@
 package task3;
 
 /**
- * The {@link QueueBroker} is a queue-based messaging broker system.
+ * The {@link EventQueueBroker} is a queue-based messaging broker system.
  * <br>
  * This broker manages connections to message queues via ports, providing mechanisms for binding, unbinding, and connecting
  * to named queues over specific ports.
@@ -9,11 +9,11 @@ package task3;
  * It acts as an intermediary between message producers and consumers, allowing for
  * asynchronous message passing.
  * <br>
- * A {@link QueueBroker} is thread-safe and can be used to manage multiple message queues concurrently.
+ * A {@link EventQueueBroker} is thread-safe and can be used to manage multiple message queues concurrently.
  *
- * @see MessageQueue
+ * @see EventMessageQueue
  */
-public abstract class QueueBroker {
+public abstract class EventQueueBroker {
     /** The name of this QueueBroker instance, used for identification purposes. */
     public final String name;
 
@@ -22,7 +22,7 @@ public abstract class QueueBroker {
      *
      * @param name the name of the queue broker
      */
-    public QueueBroker(String name) {
+    public EventQueueBroker(String name) {
         this.name = name;
     }
 
@@ -31,16 +31,19 @@ public abstract class QueueBroker {
      */
     public interface AcceptListener {
         /**
-         * Called when a new connection has been accepted to a bound {@link MessageQueue}.
+         * Called when a new connection has been accepted to a bound {@link EventMessageQueue}.
          *
-         * @param queue the accepted {@link MessageQueue}
+         * @param queue the accepted {@link EventMessageQueue}
          */
-        void accepted(MessageQueue queue);
+        void accepted(EventMessageQueue queue);
     }
 
     /**
      * Binds the queue broker to the specified port and listens for incoming connections. When a connection
      * is accepted, the provided {@code AcceptListener} will be invoked.
+     * <br>
+     * Multiple connections can result from a single bind operation.
+     * Please see {@link EventQueueBroker#unbind(int)} to stop accepting connections on a specific port.
      *
      * @param port     the port number to bind to
      * @param listener the listener to handle accepted connections
@@ -61,11 +64,11 @@ public abstract class QueueBroker {
      */
     public interface ConnectListener {
         /**
-         * Called when a connection to the {@link MessageQueue} is successfully established.
+         * Called when a connection to the {@link EventMessageQueue} is successfully established.
          *
-         * @param queue the connected {@link MessageQueue}
+         * @param queue the connected {@link EventMessageQueue}
          */
-        void connected(MessageQueue queue);
+        void connected(EventMessageQueue queue);
 
         /**
          * Called when the connection attempt has been refused.
