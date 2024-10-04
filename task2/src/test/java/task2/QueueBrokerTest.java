@@ -39,4 +39,20 @@ class QueueBrokerTest extends TitiTotoTesting {
             fail("Brokers exists, the connection should be successful");
         }
     }
+
+    @Test
+    void acceptAndConnectFromTheSameBroker() {
+        new Task(titi, () -> {
+            try {
+                titi.accept(0);
+            } catch (ConnectionFailedException e) {
+                fail("Brokers exists, the connection should be successful");
+            }
+        }).start();
+        try {
+            titi.connect("titi", 0);
+        } catch (ConnectionFailedException e) {
+            fail("Brokers exists, the connection should be successful");
+        }
+    }
 }
