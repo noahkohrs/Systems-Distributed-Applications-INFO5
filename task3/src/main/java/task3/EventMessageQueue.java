@@ -19,6 +19,8 @@ public abstract class EventMessageQueue {
     public interface Listener {
         /**
          * Called when a new message is received by this {@link EventMessageQueue}.
+         * <br>
+         * The function may be executed concurrently with other events.
          *
          * @param msg the received message
          */
@@ -26,6 +28,8 @@ public abstract class EventMessageQueue {
 
         /**
          * Called when the {@link EventMessageQueue} has been closed.
+         * <br>
+         * The function may be executed concurrently with other events.
          */
         void closed();
     }
