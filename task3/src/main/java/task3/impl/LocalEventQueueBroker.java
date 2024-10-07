@@ -1,8 +1,22 @@
 package task3.impl;
 
+import task1.exceptions.ConnectionFailedException;
+import task1.impl.LocalBroker;
+import task2.MessageQueue;
+import task2.QueueBroker;
+import task2.impl.LocalQueueBroker;
+import task3.EventMessageQueue;
 import task3.EventQueueBroker;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 public class LocalEventQueueBroker extends EventQueueBroker {
+    final Map<Integer, Thread> binders;
+
+
+    QueueBroker queueBroker;
+
     /**
      * Constructs a new {@code QueueBroker} instance with the specified name.
      *
@@ -10,20 +24,54 @@ public class LocalEventQueueBroker extends EventQueueBroker {
      */
     public LocalEventQueueBroker(String name) {
         super(name);
+        binders = new ConcurrentHashMap<>();
+        queueBroker = new LocalQueueBroker(new LocalBroker(name));
+
     }
 
     @Override
-    public boolean bind(int port, AcceptListener listener) {
-        return false;
+    public synchronized boolean bind(int port, AcceptListener listener) {
+        if (binders.containsKey(port)) {
+            return false;
+        }
+
+        Thread t = new Thread(() -> {
+            try {
+            while (true) {
+                MessageQueue msgsQueue = queueBroker.accept(port);
+                EventMessageQueue queue = new LocalEventMessageBroker(msgsQueue);
+                EventPump.post(() -> listener.accepted(queue));
+            }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
+        binders.put(port, t);
+        t.start();
+        return true;
     }
 
     @Override
-    public boolean unbind(int port) {
-        return false;
+    public synchronized boolean unbind(int port) {
+        Thread t = binders.remove(port);
+        if (t == null) {
+            return false;
+        }
+        t.interrupt();
+        return true;
     }
 
     @Override
     public boolean connect(String name, int port, ConnectListener listener) {
-        return false;
+        new Thread(() -> {
+            try {
+                MessageQueue msgsQueue = queueBroker.connect(name, port);
+                EventMessageQueue queue = new LocalEventMessageBroker(msgsQueue);
+                EventPump.post(() -> listener.connected(queue));
+            } catch (ConnectionFailedException e) {
+                EventPump.post(listener::refused);
+            }
+        }).start();
+        return true;
     }
 }

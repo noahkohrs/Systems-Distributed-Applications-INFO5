@@ -6,7 +6,7 @@ package task3;
  * Warning: the {@code bytes} array is the only field which will be written when sent to the message queue.
  */
 public class EventMessage {
-    private byte[] bytes;
+    public byte[] bytes;
 
     /**
      * Constructs a new {@code EventMessage} with the specified byte array.
