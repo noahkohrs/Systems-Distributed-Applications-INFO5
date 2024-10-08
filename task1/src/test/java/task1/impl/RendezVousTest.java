@@ -13,18 +13,16 @@ public class RendezVousTest {
         LocalBroker acceptor = new LocalBroker("acceptor");
         RendezVous rendezVous = new RendezVous();
         var task1 = new Task(connector, () -> {
-            rendezVous.connect(acceptor);
             try {
-                rendezVous.getChannelForConnector();
+                rendezVous.connect(acceptor);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
 
         var task2 = new Task(acceptor, () -> {
-            rendezVous.accept(connector);
             try {
-                rendezVous.getChannelForAcceptor();
+                rendezVous.accept(connector);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -50,18 +48,16 @@ public class RendezVousTest {
         LocalBroker acceptor = new LocalBroker("acceptor");
         RendezVous rendezVous = new RendezVous();
         var task1 = new Task(acceptor, () -> {
-            rendezVous.accept(connector);
             try {
-                rendezVous.getChannelForAcceptor();
+                rendezVous.accept(connector);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
         });
 
         var task2 = new Task(connector, () -> {
-            rendezVous.connect(acceptor);
             try {
-                rendezVous.getChannelForConnector();
+                rendezVous.connect(acceptor);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }

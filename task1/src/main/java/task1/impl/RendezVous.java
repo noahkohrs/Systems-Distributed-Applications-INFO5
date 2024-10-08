@@ -3,8 +3,6 @@ package task1.impl;
 import task1.Broker;
 import task1.Channel;
 
-import java.util.concurrent.Semaphore;
-
 class RendezVous {
 
     Broker acceptor;
