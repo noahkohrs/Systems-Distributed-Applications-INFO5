@@ -36,14 +36,14 @@ public class LocalEventQueueBroker extends EventQueueBroker {
         }
 
         Thread t = new Thread(() -> {
-            try {
             while (true) {
-                MessageQueue msgsQueue = queueBroker.accept(port);
-                EventMessageQueue queue = new LocalEventMessageBroker(msgsQueue);
-                EventPump.post(() -> listener.accepted(queue));
-            }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+                try {
+                    MessageQueue msgsQueue = queueBroker.accept(port);
+                    EventMessageQueue queue = new LocalEventMessageQueue(msgsQueue);
+                    EventPump.post(new EventTask("Accepting", () -> listener.accepted(queue)));
+                } catch (Exception e) {
+                    break;
+                }
             }
         });
         binders.put(port, t);
@@ -66,10 +66,10 @@ public class LocalEventQueueBroker extends EventQueueBroker {
         new Thread(() -> {
             try {
                 MessageQueue msgsQueue = queueBroker.connect(name, port);
-                EventMessageQueue queue = new LocalEventMessageBroker(msgsQueue);
-                EventPump.post(() -> listener.connected(queue));
+                EventMessageQueue queue = new LocalEventMessageQueue(msgsQueue);
+                EventPump.post(new EventTask("Connecting", () -> listener.connected(queue)));
             } catch (ConnectionFailedException e) {
-                EventPump.post(listener::refused);
+                EventPump.post(new EventTask("Refusing", listener::refused));
             }
         }).start();
         return true;

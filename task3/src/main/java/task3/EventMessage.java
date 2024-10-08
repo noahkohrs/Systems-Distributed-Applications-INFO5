@@ -6,7 +6,7 @@ package task3;
  * Warning: the {@code bytes} array is the only field which will be written when sent to the message queue.
  */
 public class EventMessage {
-    public byte[] bytes;
+    protected byte[] bytes;
 
     /**
      * Constructs a new {@code EventMessage} with the specified byte array.
@@ -39,5 +39,27 @@ public class EventMessage {
             }
         }
         return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 1;
+        for (byte b : bytes) {
+            result = 31 * result + b;
+        }
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return new String(bytes);
+    }
+
+    public byte[] getBytes() {
+        return bytes;
+    }
+
+    public int getLength() {
+        return bytes.length;
     }
 }
