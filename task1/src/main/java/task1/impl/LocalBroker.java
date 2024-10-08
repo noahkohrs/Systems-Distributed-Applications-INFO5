@@ -6,7 +6,6 @@ import task1.exceptions.ConnectionFailedException;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 public class LocalBroker extends Broker {
 
@@ -15,13 +14,10 @@ public class LocalBroker extends Broker {
      */
     final Map<Integer, RendezVous> rdvs;
 
-    Semaphore host = new Semaphore(1, true);
-    Semaphore connector = new Semaphore(0, true);
-
     public LocalBroker(String name) {
         super(name);
         BrokerManager.addBroker(this);
-        // As we use synchronisation on the map, it's really important that the kind of map is not synchronized by default.
+        // As we use synchronisation on the map, it's not really important that the kind of map is not synchronized by default.
         rdvs = new HashMap<>();
     }
 
@@ -31,20 +27,17 @@ public class LocalBroker extends Broker {
             throw new ConnectionFailedException(ConnectionFailedException.Issue.PORT_IN_USE_FOR_THIS_BROKER, String.valueOf(port));
         }
         try {
-            host.acquire();
             RendezVous rendezVous;
-            rdvs.put(port, new RendezVous());
-            rendezVous = rdvs.get(port);
+            synchronized (rdvs) {
+                rendezVous = new RendezVous();
+                rdvs.put(port, rendezVous);
+                rdvs.notify();
+            }
 
-            rendezVous.accept(this);
-            connector.release();
-
-            return rendezVous.getChannelForAcceptor();
+            return rendezVous.accept(this);
         } catch (InterruptedException e) {
-            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "Interrupted");
-        } finally {
             rdvs.remove(port);
-            host.release();
+            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "Interrupted");
         }
     }
 
@@ -61,10 +54,14 @@ public class LocalBroker extends Broker {
             throw new ConnectionFailedException(ConnectionFailedException.Issue.NO_BROKER_WITH_NAME, host);
         }
         try {
-            hostBroker.connector.acquire();
-            RendezVous rendezVous = hostBroker.rdvs.get(port);
-            rendezVous.connect(this);
-            return rendezVous.getChannelForConnector();
+            RendezVous rendezVous;
+            synchronized (hostBroker.rdvs) {
+                while (!hostBroker.rdvs.containsKey(port)) {
+                    hostBroker.rdvs.wait();
+                }
+                rendezVous = hostBroker.rdvs.remove(port);
+            }
+            return rendezVous.connect(this);
         } catch (InterruptedException e) {
             throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "Interruption");
         }
