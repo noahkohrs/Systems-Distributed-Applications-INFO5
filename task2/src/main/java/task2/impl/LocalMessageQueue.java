@@ -3,14 +3,15 @@ package task2.impl;
 import task1.Channel;
 import task1.exceptions.DisconnectedException;
 import task2.MessageQueue;
+
 import java.util.concurrent.Semaphore;
 
 public class LocalMessageQueue extends MessageQueue {
 
     private final Channel channel;
 
-    Semaphore sendMutex = new Semaphore(1);
-    Semaphore receiveMutex = new Semaphore(1);
+    Semaphore sendMutex = new Semaphore(1, true);
+    Semaphore receiveMutex = new Semaphore(1, true);
 
     public LocalMessageQueue(Channel channel) {
         this.channel = channel;
@@ -20,12 +21,12 @@ public class LocalMessageQueue extends MessageQueue {
     public void send(byte[] bytes, int offset, int length) throws DisconnectedException {
         try {
             sendMutex.acquire();
-            // Length of an int is 4 bytes
+
             var lengthBytes = intToBytes(length);
 
             var lengthIndex = 0;
             while (lengthIndex < 4) {
-                lengthIndex += channel.write(lengthBytes, lengthIndex, 4);
+                lengthIndex += channel.write(lengthBytes, lengthIndex, 4 - lengthIndex);
             }
 
             var index = 0;
@@ -44,9 +45,9 @@ public class LocalMessageQueue extends MessageQueue {
     @Override
     public byte[] receive() throws DisconnectedException {
         try {
-            receiveMutex.acquire();
             var lengthBytes = new byte[4];
             var lengthIndex = 0;
+            receiveMutex.acquire();
             while (lengthIndex < 4) {
                 lengthIndex += channel.read(lengthBytes, lengthIndex, 4);
             }
@@ -54,7 +55,7 @@ public class LocalMessageQueue extends MessageQueue {
             var bytes = new byte[length];
             var index = 0;
             while (index < length) {
-                index += channel.read(bytes, index, length-index);
+                index += channel.read(bytes, index, length - index);
             }
             return bytes;
         } catch (InterruptedException e) {

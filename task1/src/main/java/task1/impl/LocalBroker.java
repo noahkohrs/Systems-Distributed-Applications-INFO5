@@ -15,7 +15,7 @@ public class LocalBroker extends Broker {
      */
     final Map<Integer, RendezVous> rdvs;
 
-    Semaphore host = new Semaphore(1);
+    Semaphore host = new Semaphore(1, true);
     Semaphore connector = new Semaphore(0, true);
 
     public LocalBroker(String name) {
@@ -33,7 +33,7 @@ public class LocalBroker extends Broker {
         try {
             host.acquire();
             RendezVous rendezVous;
-            rdvs.putIfAbsent(port, new RendezVous());
+            rdvs.put(port, new RendezVous());
             rendezVous = rdvs.get(port);
 
             rendezVous.accept(this);
@@ -41,7 +41,7 @@ public class LocalBroker extends Broker {
 
             return rendezVous.getChannelForAcceptor();
         } catch (InterruptedException e) {
-            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "");
+            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "Interrupted");
         } finally {
             rdvs.remove(port);
             host.release();
@@ -66,7 +66,7 @@ public class LocalBroker extends Broker {
             rendezVous.connect(this);
             return rendezVous.getChannelForConnector();
         } catch (InterruptedException e) {
-            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "");
+            throw new ConnectionFailedException(ConnectionFailedException.Issue.ERROR, "Interruption");
         }
     }
 

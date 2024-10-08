@@ -11,8 +11,8 @@ class RendezVous {
     Broker connector;
     LocalChannel channelForAcceptor;
     LocalChannel channelForConnector;
-    Semaphore accept = new Semaphore(0);
-    Semaphore connect = new Semaphore(0);
+    Semaphore accept = new Semaphore(0, true);
+    Semaphore connect = new Semaphore(0, true);
 
     private synchronized void createChannels() {
         if (channelForConnector == null && channelForAcceptor == null) {
