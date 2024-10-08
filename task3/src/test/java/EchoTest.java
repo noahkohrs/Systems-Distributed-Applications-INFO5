@@ -40,7 +40,12 @@ public class EchoTest {
 
         client.connect("server", 0, new Connector(sentMessages, receivedMessages));
 
-        Thread.sleep(100);
+        int MAX_DURATION = 1000;
+        int duration = 0;
+        while (receivedMessages.size() < sentMessages.size() && duration < MAX_DURATION) {
+            duration += 5;
+            Thread.sleep(5);
+        }
 
         assertEquals(sentMessages, receivedMessages);
         server.unbind(0);
