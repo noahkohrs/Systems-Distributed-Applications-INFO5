@@ -1,3 +1,5 @@
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import task3.EventMessage;
 import task3.EventMessageQueue;
@@ -11,24 +13,37 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class EchoTest {
 
-    @Test
-    public void testEcho() throws InterruptedException {
-        var server = new LocalEventQueueBroker("server");
-        var client = new LocalEventQueueBroker("client");
+    static LocalEventQueueBroker server;
+    static LocalEventQueueBroker client;
 
+    @BeforeAll
+    public static void setup() {
+        server = new LocalEventQueueBroker("server");
+        client = new LocalEventQueueBroker("client");
+    }
+
+    private void populateMessages(List<EventMessage> messages) {
+        messages.add(new StringMessage("Hello"));
+        messages.add(new StringMessage("World"));
+        messages.add(new StringMessage("Goodbye"));
+        messages.add(new StringMessage("Life"));
+    }
+
+    @RepeatedTest(100)
+    public void testEcho() throws InterruptedException {
         server.bind(0, new EchoServer());
 
-        List<EventMessage> sentMessages = List.of(
-                new EventMessage("Hello".getBytes()),
-                new EventMessage("World".getBytes())
-        );
+        List<EventMessage> sentMessages = new ArrayList<>();
+        populateMessages(sentMessages);
+
         List<EventMessage> receivedMessages = new ArrayList<>();
 
         client.connect("server", 0, new Connector(sentMessages, receivedMessages));
 
-        Thread.sleep(1000);
+        Thread.sleep(100);
 
         assertEquals(sentMessages, receivedMessages);
+        server.unbind(0);
     }
 }
 
@@ -70,7 +85,9 @@ class Connector implements EventQueueBroker.ConnectListener {
     public void connected(EventMessageQueue queue) {
         var redirector = new TestRedirector(queue, receivedMessages);
         queue.setListener(redirector);
-        messagesToSend.forEach(queue::send);
+        for (var msg : messagesToSend) {
+            queue.send(msg);
+        }
     }
 
     @Override
@@ -96,5 +113,12 @@ class TestRedirector implements EventMessageQueue.Listener {
     @Override
     public void closed() {
         queue.close();
+    }
+}
+
+class StringMessage extends EventMessage {
+
+    public StringMessage(String str) {
+        super(str.getBytes());
     }
 }
