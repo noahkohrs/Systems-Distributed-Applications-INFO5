@@ -13,57 +13,58 @@ public class LocalChannel extends Channel {
     /**
      * The opposite channel side.
      */
-    LocalChannel oppositeGateway;
+    protected LocalChannel oppositeGateway;
     /**
      * The name of the broker that this channel side is associated with.
      * This is used for debugging purposes.
      */
     final String brokerName;
 
-    CircularBuffer data = new CircularBuffer(1024);
+    private final CircularBuffer data;
 
     public LocalChannel(String brokerName) {
+        this(brokerName, 1024);
+    }
+
+    public LocalChannel(String brokerName, int bufferSize) {
         super();
         this.brokerName = brokerName;
+        data = new CircularBuffer(bufferSize);
     }
 
     @Override
     public int read(byte[] bytes, int offset, int length) throws DisconnectedException {
-        try {
-            synchronized (this) {
-                if (!this.connected) {
+        synchronized (this) {
+            if (!this.connected) {
+                throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
+            }
+            while (data.empty()) {
+                if (!this.connected || !oppositeGateway.connected) {
                     throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
-                }
-                while (data.empty()) {
-                    if (!this.connected || !oppositeGateway.connected) {
-                        throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
-                    } else {
-                        try {
-                            wait();
-                        } catch (InterruptedException e) {
-                            disconnect();
-                            throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
-                        }
+                } else {
+                    try {
+                        wait();
+                    } catch (InterruptedException e) {
+                        disconnect();
+                        throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
                     }
                 }
-                var bytesRead = 0;
-                while (!data.empty() && bytesRead < length) {
-                    bytes[offset + bytesRead] = data.pull();
-                    bytesRead++;
-                }
-                return bytesRead; // Return the number of bytes read
             }
-        } finally {
-            synchronized (oppositeGateway) {
-                oppositeGateway.notifyAll();  // Notify writers waiting for space
+            var bytesRead = 0;
+            while (!data.empty() && bytesRead < length) {
+                bytes[offset + bytesRead] = data.pull();
+                bytesRead++;
             }
+            notifyAll();
+            return bytesRead; // Return the number of bytes read
         }
     }
 
     @Override
     public int write(byte[] bytes, int offset, int length) throws DisconnectedException {
-        try {
-            synchronized (this) {
+        synchronized (oppositeGateway) {
+            try {
+
                 if (!this.connected || !oppositeGateway.connected) {
                     throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
                 }
@@ -73,7 +74,7 @@ public class LocalChannel extends Channel {
                         if (!this.connected || !oppositeGateway.connected) {
                             throw new DisconnectedException(DisconnectedException.DisconnectionKind.NATURAL);
                         }
-                        wait();
+                        oppositeGateway.wait();
                     } catch (InterruptedException e) {
                         disconnect();
                         throw new DisconnectedException(DisconnectedException.DisconnectionKind.ERROR);
@@ -84,15 +85,12 @@ public class LocalChannel extends Channel {
                     data.push(bytes[offset + spaceToWrite]);
                     spaceToWrite++;
                 }
-                return spaceToWrite; // Return the number of bytes written
-            }
-        } finally {
-            synchronized (oppositeGateway) {
-                oppositeGateway.notifyAll();  // Notify readers waiting for data
+                return spaceToWrite;
+            } finally {
+                oppositeGateway.notify();
             }
         }
     }
-
 
     @Override
     public void disconnect() {
