@@ -10,6 +10,14 @@ import task1.exceptions.DisconnectedException;
  * A message queue is alive until an error occurs, or it is closed via {@link #close()}.
  */
 public abstract class MessageQueue {
+    /**
+     * Parent queue broker
+     */
+    public final QueueBroker parentQueueBroker;
+
+    public MessageQueue(QueueBroker queueBroker) {
+        parentQueueBroker = queueBroker;
+    }
 
     /**
      * Send the given bytes (called message) to the other end of the message queue, which can be received by calling {@link #receive()}.

@@ -12,8 +12,8 @@ class RendezVous {
 
     private synchronized void createChannels() {
         if (channelForConnector == null && channelForAcceptor == null) {
-            channelForConnector = new LocalChannel(connector.name);
-            channelForAcceptor = new LocalChannel(acceptor.name);
+            channelForConnector = new LocalChannel(connector);
+            channelForAcceptor = new LocalChannel(acceptor);
 
             channelForConnector.oppositeGateway = channelForAcceptor;
             channelForAcceptor.oppositeGateway = channelForConnector;

@@ -17,11 +17,11 @@ public class LocalQueueBroker extends QueueBroker {
 
     @Override
     public MessageQueue accept(int port) throws ConnectionFailedException {
-        return new LocalMessageQueue(broker.accept(port));
+        return new LocalMessageQueue(broker.accept(port), this);
     }
 
     @Override
     public MessageQueue connect(String name, int port) throws ConnectionFailedException {
-        return new LocalMessageQueue(broker.connect(name, port));
+        return new LocalMessageQueue(broker.connect(name, port), this);
     }
 }

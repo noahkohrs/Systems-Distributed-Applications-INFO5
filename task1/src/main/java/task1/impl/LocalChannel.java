@@ -1,6 +1,7 @@
 package task1.impl;
 
 import info5.sar.utils.CircularBuffer;
+import task1.Broker;
 import task1.Channel;
 import task1.exceptions.DisconnectedException;
 
@@ -14,21 +15,15 @@ public class LocalChannel extends Channel {
      * The opposite channel side.
      */
     protected LocalChannel oppositeGateway;
-    /**
-     * The name of the broker that this channel side is associated with.
-     * This is used for debugging purposes.
-     */
-    final String brokerName;
 
     private final CircularBuffer data;
 
-    public LocalChannel(String brokerName) {
-        this(brokerName, 1024);
+    public LocalChannel(Broker broker) {
+        this(broker, 1024);
     }
 
-    public LocalChannel(String brokerName, int bufferSize) {
-        super();
-        this.brokerName = brokerName;
+    public LocalChannel(Broker broker, int bufferSize) {
+        super(broker);
         data = new CircularBuffer(bufferSize);
     }
 

@@ -13,6 +13,11 @@ import task1.exceptions.DisconnectedException;
  */
 public abstract class Channel {
 
+    public final Broker parentBroker;
+
+    public Channel(Broker b) {
+        parentBroker = b;
+    }
     /**
      * Read up to length bytes from the channel into the given buffer.
      * <br>

@@ -3,6 +3,7 @@ package task2.impl;
 import task1.Channel;
 import task1.exceptions.DisconnectedException;
 import task2.MessageQueue;
+import task2.QueueBroker;
 
 import java.util.concurrent.Semaphore;
 
@@ -13,7 +14,8 @@ public class LocalMessageQueue extends MessageQueue {
     Semaphore sendMutex = new Semaphore(1, true);
     Semaphore receiveMutex = new Semaphore(1, true);
 
-    public LocalMessageQueue(Channel channel) {
+    public LocalMessageQueue(Channel channel, QueueBroker queueBroker) {
+        super(queueBroker);
         this.channel = channel;
     }
 
