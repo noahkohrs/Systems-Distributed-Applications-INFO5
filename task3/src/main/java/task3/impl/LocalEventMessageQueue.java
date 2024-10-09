@@ -1,19 +1,19 @@
 package task3.impl;
 
-import task1.exceptions.DisconnectedException;
 import task2.MessageQueue;
+import task2.Task;
 import task3.EventMessage;
 import task3.EventMessageQueue;
 
+import java.util.LinkedList;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class LocalEventMessageQueue extends EventMessageQueue {
 
     private final MessageQueue msgsQueue;
 
-    private final Thread receiverThread;
-    private final Thread senderThread;
+    private final Task receiverThread;
+    private final Task senderThread;
 
     Queue<EventMessage> messageSending;
 
@@ -23,15 +23,16 @@ public class LocalEventMessageQueue extends EventMessageQueue {
     public LocalEventMessageQueue(MessageQueue msgsQueue) {
         super();
         this.msgsQueue = msgsQueue;
-        receiverThread = new Thread(this::receiveMessages);
-        senderThread = new Thread(this::sendMessages);
-        messageSending = new ConcurrentLinkedQueue<>();
-        receiverThread.start();
+        receiverThread = new Task(msgsQueue.parentQueueBroker, this::receiveMessages);
+        senderThread = new Task(msgsQueue.parentQueueBroker, this::sendMessages);
+        messageSending = new LinkedList<>();
         senderThread.start();
     }
 
     @Override
     public void setListener(Listener l) {
+        if (!receiverThread.isAlive() && !receiverThread.isInterrupted())
+            receiverThread.start();
         listener = l;
     }
 
@@ -40,7 +41,10 @@ public class LocalEventMessageQueue extends EventMessageQueue {
         if (msgsQueue.closed()) {
             return false;
         }
-        messageSending.add(msg);
+        synchronized (messageSending) {
+            messageSending.add(msg);
+            messageSending.notify();
+        }
         return true;
     }
 
@@ -48,7 +52,9 @@ public class LocalEventMessageQueue extends EventMessageQueue {
     public void close() {
         receiverThread.interrupt();
         senderThread.interrupt();
+        // Non-blocking operation
         msgsQueue.close();
+        if (listener != null) EventPump.post("Closed", listener::closed);
     }
 
     @Override
@@ -58,11 +64,13 @@ public class LocalEventMessageQueue extends EventMessageQueue {
 
     private void receiveMessages() {
         while (true) {
+
             try {
                 byte[] msg = msgsQueue.receive();
                 EventMessage message = new EventMessage(msg);
-                EventPump.post(new EventTask("Receiving " + message, () -> listener.received(message)));
+                if (listener != null) EventPump.post("Receiving " + message, () -> listener.received(message));
             } catch (Exception e) {
+                if (listener != null) EventPump.post("Closed", listener::closed);
                 break;
             }
         }
@@ -72,14 +80,16 @@ public class LocalEventMessageQueue extends EventMessageQueue {
     private void sendMessages() {
         while (true) {
             try {
-                if (messageSending.isEmpty()) {
-                    Thread.sleep(10);
-                    continue;
+                EventMessage msg;
+                synchronized (messageSending) {
+                    if (!messageSending.isEmpty()) {
+                        msg = messageSending.poll();
+                    } else {
+                        messageSending.wait();
+                        continue;
+                    }
                 }
-                EventMessage msg = messageSending.poll();
                 msgsQueue.send(msg.getBytes(), 0, msg.getLength());
-                EventPump.post(new EventTask("Sending " + msg, () -> {
-                }));
             } catch (Exception e) {
                 break;
             }
