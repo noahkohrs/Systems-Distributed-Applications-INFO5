@@ -6,8 +6,6 @@ package task3;
  * It provides methods for sending and receiving byte-encoded messages and managing the queue's lifecycle.
  * Implementations of {@link EventMessageQueue} allow for registering a {@link Listener} to handle incoming messages
  * and queue closure events.
- * <br>
- * A {@link EventMessageQueue} is thread-safe and supports concurrent sending and receiving of messages.
  *
  * @see EventQueueBroker
  */
@@ -20,7 +18,7 @@ public abstract class EventMessageQueue {
         /**
          * Called when a new message is received by this {@link EventMessageQueue}.
          * <br>
-         * The function may be executed concurrently with other events.
+         * The function will never be executed concurrently with other events.
          *
          * @param msg the received message
          */
@@ -29,7 +27,7 @@ public abstract class EventMessageQueue {
         /**
          * Called when the {@link EventMessageQueue} has been closed.
          * <br>
-         * The function may be executed concurrently with other events.
+         * The function will never be executed concurrently with other events.
          */
         void closed();
     }

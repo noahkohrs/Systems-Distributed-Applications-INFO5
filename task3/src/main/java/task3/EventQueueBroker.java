@@ -33,7 +33,7 @@ public abstract class EventQueueBroker {
         /**
          * Called when a new connection has been accepted to a bound {@link EventMessageQueue}.
          * <br>
-         * The function may be executed concurrently with other events.
+         * The function will never be executed concurrently with other events.
          *
          * @param queue the accepted {@link EventMessageQueue}
          */
@@ -68,7 +68,7 @@ public abstract class EventQueueBroker {
         /**
          * Called when a connection to the {@link EventMessageQueue} is successfully established.
          * <br>
-         * The function may be executed concurrently with other events.
+         * The function will never be executed concurrently with other events.
          *
          * @param queue the connected {@link EventMessageQueue}
          */
@@ -77,7 +77,7 @@ public abstract class EventQueueBroker {
         /**
          * Called when the connection attempt has been refused.
          * <br>
-         * The function may be executed concurrently with other events.
+         * The function will never be executed concurrently with other events.
          *
          */
         void refused();
