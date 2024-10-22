@@ -23,8 +23,12 @@ public abstract class Channel {
     public interface ReadListener {
         /**
          * Called when a new message is received by this {@link Channel}.
+         * The callback only happens once after any upcoming write operation
+         * happened since last time this event has been received.
          * <br>
          * The function will never be executed concurrently with other events.
+         *
+         *
          * @param channel the {@link Channel} that received the message.
          */
         void received(Channel channel);
