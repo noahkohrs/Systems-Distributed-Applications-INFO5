@@ -41,7 +41,9 @@ public abstract class Broker {
     /**
      * Connect to a remote host on the given port.
      * <br>
-     * This is a blocking operation, it will return only once a connection has been established.
+     * This is a blocking operation, it will return immediately.
+     * <br>
+     * Connect will only result once the accept operation has been called on the target.
      *
      * @param host the host to connect to.
      * @param port the port to connect to.
