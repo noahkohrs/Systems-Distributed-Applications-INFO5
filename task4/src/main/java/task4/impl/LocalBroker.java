@@ -28,7 +28,6 @@ public class LocalBroker extends Broker {
     /**
      * @param port     the port to listen on.
      * @param listener the listener to handle accepted connections
-     *
      * @throws IllegalStateException if the connection could not be established (check if the port is already in use).
      */
     @Override

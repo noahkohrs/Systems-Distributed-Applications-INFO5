@@ -28,7 +28,6 @@ public abstract class Channel {
          * <br>
          * The function will never be executed concurrently with other events.
          *
-         *
          * @param channel the {@link Channel} that received the message.
          */
         void received(Channel channel);
@@ -38,7 +37,8 @@ public abstract class Channel {
          * <br>
          * The function will never be executed concurrently with other events.
          */
-        default void closed() {};
+        default void closed() {
+        }
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class Channel {
      * This is a non-blocking operation, it will return only once all the bytes have been written.
      * Note: Zero bytes can be written if the channel is full or the connection is closed.
      *
-     * @param bytes the buffer to write from.
+     * @param bytes  the buffer to write from.
      * @param offset the offset in the buffer to start writing from.
      * @param length the number of bytes to write.
      * @return true if the operation succeeded, false otherwise.
@@ -76,7 +76,8 @@ public abstract class Channel {
 
     /**
      * Read up to length bytes from the channel into the given buffer.
-     * @param bytes the buffer to read into.
+     *
+     * @param bytes  the buffer to read into.
      * @param offset the offset in the buffer to start reading into.
      * @param length the maximum number of bytes to read.
      * @return the number of bytes read.
@@ -95,6 +96,7 @@ public abstract class Channel {
 
     /**
      * Check if the channel is disconnected.
+     *
      * @return true if the channel is disconnected, false otherwise.
      */
     public abstract boolean disconnected();

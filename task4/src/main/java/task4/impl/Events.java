@@ -1,16 +1,11 @@
 package task4.impl;
 
-import task4.Channel;
 import task4.EventTask;
 
 class WriteEvent extends EventTask {
 
-    public WriteEvent(LocalChannel sender, LocalChannel receiver, Runnable runnable) {
-        this(null, sender, receiver, runnable);
-    }
-
-    public WriteEvent(String specialValue, LocalChannel sender, LocalChannel receiver, Runnable runnable) {
-        super((specialValue==null) ? "WriteCallback": "WriteCallback : " + specialValue, () -> {
+    public WriteEvent(String valueRepr, LocalChannel sender, LocalChannel receiver, Runnable runnable) {
+        super((valueRepr==null) ? "WriteCallback": "WriteCallback : " + valueRepr, () -> {
             if (sender.disconnected()) {
                 return;
             }
