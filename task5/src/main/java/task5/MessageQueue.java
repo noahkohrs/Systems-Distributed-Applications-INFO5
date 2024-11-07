@@ -42,8 +42,9 @@ public abstract class MessageQueue {
          * Called when a new {@link Message} is received.
          *
          * @param message the received message.
+         * @param queue the {@link MessageQueue} that received the message.
          */
-        void received(Message message);
+        void received(Message message, MessageQueue queue);
 
         /**
          * Called when the connection has been closed by the remote peer.
@@ -59,7 +60,8 @@ public abstract class MessageQueue {
          * Called when the {@link Message} has been successfully sent.
          *
          * @param message the message that was sent.
+         * @param queue the {@link MessageQueue} that sent the message.
          */
-        void written(Message message);
+        void written(Message message, MessageQueue queue);
     }
 }
