@@ -84,6 +84,6 @@ public abstract class QueueBroker {
         /**
          * Called when a connection attempt is refused or fails.
          */
-        void refused();
+        default void refused() {};
     }
 }
