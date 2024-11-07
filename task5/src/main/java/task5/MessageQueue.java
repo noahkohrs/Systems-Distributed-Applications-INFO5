@@ -1,16 +1,18 @@
 package task5;
 
+import com.sun.nio.sctp.MessageInfo;
+import task4.Broker;
+
 /**
  * A MessagesQueue represents a channel for sending and receiving {@link Message} objects.
  * <br>
  * Unlike a {@link task4.Channel}, this abstraction works at the message level instead of individual bytes.
  */
 public abstract class MessageQueue {
-
     /**
      * Sends a {@link Message} to the remote peer.
      * <br>
-     * This is a non-blocking operation that will return immediately, triggering the {@link WriteListener#written(Message)} once the message is fully sent.
+     * This is a non-blocking operation that will return immediately, triggering the {@link WriteListener#written(Message, MessageQueue)} once the message is fully sent.
      *
      * @param message the message to be sent.
      * @param listener the listener to handle the completion of the send operation.
