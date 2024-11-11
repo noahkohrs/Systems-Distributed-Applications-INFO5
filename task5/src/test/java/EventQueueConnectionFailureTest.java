@@ -32,5 +32,7 @@ public class EventQueueConnectionFailureTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        Brokers.localQueueBroker.unbind(1234);
     }
 }

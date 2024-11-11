@@ -10,7 +10,7 @@ public class EventQueueCloseConnectionTest {
 
     @Test
     public void testCloseConnection() {
-        Brokers.localQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener(queue)));
+        Brokers.localQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener()));
 
         ArrayList<Message> receivedMessages = new ArrayList<>();
         Brokers.localQueueBroker.connect("LocalBroker", 1234,
@@ -56,7 +56,7 @@ public class EventQueueCloseConnectionTest {
 
         // Assert that the message was received
         Assertions.assertEquals(1, receivedMessages.size());
-        Assertions.assertEquals("Test message", new String(receivedMessages.get(0).getBytes()));
+        Assertions.assertEquals("Test message", receivedMessages.getFirst().toString());
 
         // Now check that no new messages are received after closing the connection
         int initialSize = receivedMessages.size();
@@ -66,17 +66,12 @@ public class EventQueueCloseConnectionTest {
             e.printStackTrace();
         }
         Assertions.assertEquals(initialSize, receivedMessages.size(), "No new messages should be received after closing.");
+
+        Brokers.localQueueBroker.unbind(1234);
     }
 
     // Define EchoListener here
     private static class EchoListener implements MessageQueue.ReadListener, MessageQueue.WriteListener {
-
-        private final MessageQueue queue;
-
-        EchoListener(MessageQueue queue) {
-            this.queue = queue;
-        }
-
         @Override
         public void received(Message message, MessageQueue queue) {
             // Echoes the received message

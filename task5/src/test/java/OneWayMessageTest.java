@@ -68,7 +68,7 @@ class ServerListener implements MessageQueue.ReadListener {
 
     @Override
     public void received(Message message, MessageQueue queue) {
-        System.out.println("Server received message: " + new String(message.getBytes()));
+        System.out.println("Server received message: " + message.toString());
         receivedMessages.add(message);
         latch.countDown();
     }
@@ -84,6 +84,6 @@ class ClientWriteListener implements MessageQueue.WriteListener {
 
     @Override
     public void written(Message message, MessageQueue queue) {
-        System.out.println("Client sent message: " + new String(message.getBytes()));
+        System.out.println("Client sent message: " + message.toString());
     }
 }

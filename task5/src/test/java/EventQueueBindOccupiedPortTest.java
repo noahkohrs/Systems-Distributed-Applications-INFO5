@@ -12,5 +12,8 @@ public class EventQueueBindOccupiedPortTest {
         Assertions.assertThrows(IllegalStateException.class, () -> {
             Brokers.localQueueBroker.bind(1234, queue -> {});
         });
+
+        // Unbind the port
+        Brokers.localQueueBroker.unbind(1234);
     }
 }

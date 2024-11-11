@@ -155,7 +155,7 @@ class ClientListener implements MessageQueue.ReadListener, MessageQueue.WriteLis
         received.add(message);
         latch.countDown();
 
-        System.out.println("Client " + id + " received message: " + new String(message.getBytes()));
+        System.out.println("Client " + id + " received message: " + message.toString());
 
         if (indexToWrite < toSend.size()) {
             queue.send(toSend.get(indexToWrite), this);
@@ -170,7 +170,7 @@ class ClientListener implements MessageQueue.ReadListener, MessageQueue.WriteLis
 
     @Override
     public void written(Message message, MessageQueue queue) {
-        System.out.println("Message sent: " + new String(message.getBytes()));
+        System.out.println("Message sent: " + message.toString());
     }
 }
 
@@ -178,7 +178,7 @@ class EchoListener implements MessageQueue.ReadListener, MessageQueue.WriteListe
 
     @Override
     public void received(Message message, MessageQueue queue) {
-        System.out.println("Echoing message: " + new String(message.getBytes()));
+        System.out.println("Echoing message: " + message.toString());
         queue.send(message, this);  // Echoes back
     }
 
