@@ -53,6 +53,9 @@ public class Message {
 
     @Override
     public String toString() {
+        if (bytes.length > 64) {
+            return "Message[length=" + bytes.length + "]";
+        }
         return new String(bytes);
     }
 
