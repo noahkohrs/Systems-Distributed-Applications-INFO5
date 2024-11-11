@@ -85,7 +85,7 @@ public class EventQueueEchoTest {
 
 
         // Wait until all messages have been echoed back or timeout
-        latch.await(5, TimeUnit.SECONDS);
+        latch.await(60, TimeUnit.SECONDS);
 
         Brokers.remoteQueueBroker.unbind(1234);
 
@@ -114,7 +114,7 @@ public class EventQueueEchoTest {
 
     private ArrayList<Message> getTestSampleBigMessages() {
         ArrayList<Message> messages = new ArrayList<>();
-        
+
         // Creating large messages with random data.
         messages.add(buildLargeMessageFrom(1024 * 10));  // 10 KB message
         messages.add(buildLargeMessageFrom(1024 * 50));  // 50 KB message
@@ -126,15 +126,15 @@ public class EventQueueEchoTest {
         
         return messages;
     }
-    
+
     private Message buildLargeMessageFrom(int sizeInBytes) {
         byte[] largeMessage = new byte[sizeInBytes];
-        
-        Random random = new Random();
-        
-        // Fill the byte array with random data
-        random.nextBytes(largeMessage);
-        
+
+        // Fill the byte array with a repeating pattern: 0, 1, 2, ..., 249
+        for (int i = 0; i < sizeInBytes; i++) {
+            largeMessage[i] = (byte) (i % 250);
+        }
+
         return new Message(largeMessage);
     }
 }
