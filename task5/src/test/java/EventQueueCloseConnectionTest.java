@@ -13,12 +13,10 @@ public class EventQueueCloseConnectionTest {
 
     @Test
     public void testCloseConnection() {
-        Broker localBroker = new LocalBroker("LocalBroker");
-        QueueBroker localQueueBroker = new QueueBrokerImpl(localBroker);
-        localQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener(queue)));
+        Brokers.localQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener(queue)));
 
         ArrayList<Message> receivedMessages = new ArrayList<>();
-        localQueueBroker.connect("LocalBroker", 1234,
+        Brokers.localQueueBroker.connect("LocalBroker", 1234,
             new QueueBroker.ConnectListener() {
                 @Override
                 public void connected(MessageQueue queue) {

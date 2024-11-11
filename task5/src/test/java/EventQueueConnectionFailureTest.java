@@ -13,13 +13,11 @@ public class EventQueueConnectionFailureTest {
 
     @Test
     public void testConnectionFailure() {
-        Broker localBroker = new LocalBroker("LocalBroker");
-        QueueBroker localQueueBroker = new QueueBrokerImpl(localBroker);
 
-        localQueueBroker.bind(1234, queue -> {});
+        Brokers.localQueueBroker.bind(1234, queue -> {});
 
         // Attempt to connect to a non-existent host
-        localQueueBroker.connect("NonExistingHost", 1234,
+        Brokers.localQueueBroker.connect("NonExistingHost", 1234,
             new QueueBroker.ConnectListener() {
                 @Override
                 public void connected(MessageQueue queue) {
