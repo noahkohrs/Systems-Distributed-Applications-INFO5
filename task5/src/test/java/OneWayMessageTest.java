@@ -1,11 +1,7 @@
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import task4.Broker;
-import task4.impl.LocalBroker;
 import task5.Message;
 import task5.MessageQueue;
-import task5.QueueBroker;
-import task5.impl.QueueBrokerImpl;
 
 import java.util.ArrayList;
 import java.util.concurrent.CountDownLatch;
