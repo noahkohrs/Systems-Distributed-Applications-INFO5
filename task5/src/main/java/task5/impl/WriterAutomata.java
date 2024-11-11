@@ -54,22 +54,20 @@ public class WriterAutomata implements Channel.WriteListener {
     @Override
     public void written(int bytes) {
         currentBytesIndex += bytes;
+
         if (currentBytesIndex == currentBytes.length) {
             state = State.WAITING_FOR_NEXT;
-            var createdMessage = new Message(currentBytes, 4, currentBytes.length - 4);
-
+            currentBytesIndex = 0;
             if (currentMessageListener != null) {
+                Message createdMessage = new Message(currentBytes, 4, currentBytes.length - 4);
                 currentMessageListener.written(createdMessage, owner);
             }
-
-            currentBytes = null;
-            currentMessageListener = null;
-            sendWhateverICan();
-
         } else if (currentBytesIndex > currentBytes.length) {
             throw new IllegalStateException("PANIC: Wrote more bytes than expected");
         }
+        sendWhateverICan();
     }
+
 
     private static byte[] intToBytes(int value) {
         byte[] bytes = new byte[4];
