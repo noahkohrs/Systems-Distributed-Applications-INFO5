@@ -17,22 +17,18 @@ public class EventQueueEchoTest {
 
     @Test
     public void testEcho() throws InterruptedException {
-        Broker localBroker = new LocalBroker("LocalBroker");
-        Broker remoteBroker = new LocalBroker("RemoteBroker");
-        QueueBroker localQueueBroker = new QueueBrokerImpl(localBroker);
-        QueueBroker remoteQueueBroker = new QueueBrokerImpl(remoteBroker);
 
         // Prepare a latch to wait for all clients to receive all messages
         CountDownLatch latch = new CountDownLatch(NUMBER_OF_CLIENTS * getTestSampleMessages().size());
         ArrayList<ArrayList<Message>> messagesCalledBack = new ArrayList<>();
 
         // Set up the echo server
-        remoteQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener()));
+        Brokers.remoteQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener()));
 
         // Initialize each client and connect
         for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
             int clientId = i;
-            localQueueBroker.connect(
+            Brokers.localQueueBroker.connect(
                     "RemoteBroker", 1234,
                     queue -> {
                         var callbackGateway = new ArrayList<Message>();
@@ -50,7 +46,7 @@ public class EventQueueEchoTest {
         // Wait until all messages have been echoed back or timeout
         latch.await(5, TimeUnit.SECONDS);
 
-        remoteQueueBroker.unbind(1234);
+        Brokers.remoteQueueBroker.unbind(1234);
 
 
         // Doing the checks
