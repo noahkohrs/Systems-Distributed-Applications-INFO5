@@ -15,6 +15,7 @@ public class WriterAutomata implements Channel.WriteListener {
     private byte[] currentBytes;
     private int currentBytesIndex = 0;
     private MessageQueue.WriteListener currentMessageListener = null;
+    private Message currentMessage = null;
     private State state = State.WAITING_FOR_NEXT;
 
     public WriterAutomata(MessageQueue owner, Channel channel) {
@@ -23,6 +24,10 @@ public class WriterAutomata implements Channel.WriteListener {
     }
 
     boolean send(Message message, MessageQueue.WriteListener listener) {
+        if (channel.disconnected()) {
+            return false;
+        }
+
         toSend.add(new ToSendMessage(message, listener));
         if (state == State.WAITING_FOR_NEXT) {
             sendWhateverICan();
@@ -41,6 +46,7 @@ public class WriterAutomata implements Channel.WriteListener {
                 System.arraycopy(message.getBytes(), 0, currentBytes, 4, length);
                 currentBytesIndex = 0; // Reset the index for new message
                 currentMessageListener = toSendMsg.listener;
+                currentMessage = message;
                 state = State.SENDING_BYTES;
             }
         }
@@ -59,8 +65,7 @@ public class WriterAutomata implements Channel.WriteListener {
             state = State.WAITING_FOR_NEXT;
             currentBytesIndex = 0;
             if (currentMessageListener != null) {
-                Message createdMessage = new Message(currentBytes, 4, currentBytes.length - 4);
-                currentMessageListener.written(createdMessage, owner);
+                currentMessageListener.written(currentMessage, owner);
             }
         } else if (currentBytesIndex > currentBytes.length) {
             throw new IllegalStateException("PANIC: Wrote more bytes than expected");

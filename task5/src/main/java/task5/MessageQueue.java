@@ -1,7 +1,4 @@
 package task5;
-
-import com.sun.nio.sctp.MessageInfo;
-import task4.Broker;
 import task4.Channel;
 
 /**
@@ -57,7 +54,7 @@ public abstract class MessageQueue {
         void received(Message message, MessageQueue queue);
 
         /**
-         * Called when the connection has been closed by the remote peer.
+         * Called once when the connection has been closed by the opposite peer.
          */
         void closed();
     }

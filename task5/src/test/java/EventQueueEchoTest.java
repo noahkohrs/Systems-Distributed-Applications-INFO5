@@ -40,13 +40,18 @@ public class EventQueueEchoTest {
                         queue.setListener(new ClientListener(clientId, getTestSampleMessages(), callbackGateway, latch));
 
                         // Send the first message
-                        queue.send(getTestSampleMessages().get(0), new ClientListener(clientId, getTestSampleMessages(), callbackGateway, latch));
+                        queue.send(getTestSampleMessages().getFirst(), new ClientListener(clientId, getTestSampleMessages(), callbackGateway, latch));
                     }
             );
         }
 
+
+
         // Wait until all messages have been echoed back or timeout
         latch.await(5, TimeUnit.SECONDS);
+
+        remoteQueueBroker.unbind(1234);
+
 
         // Doing the checks
         for (ArrayList<Message> messages : messagesCalledBack) {
