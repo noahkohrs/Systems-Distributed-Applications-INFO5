@@ -8,66 +8,53 @@ import task5.QueueBroker;
 import task5.impl.QueueBrokerImpl;
 
 import java.util.ArrayList;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class EventQueueEchoTest {
 
-    public final int NUMBER_OF_CLIENT = 10;
-    @Test
-    public void testEcho() {
-        Broker localBroker = new LocalBroker("LocalBroker");
-        QueueBroker localQueueBroker = new QueueBrokerImpl(localBroker);
-        localQueueBroker.bind(
-                1234,
-                queue -> queue.setListener(new EchoListener(queue))
-        );
+    public final int NUMBER_OF_CLIENTS = 10;
 
+    @Test
+    public void testEcho() throws InterruptedException {
+
+        // Prepare a latch to wait for all clients to receive all messages
+        CountDownLatch latch = new CountDownLatch(NUMBER_OF_CLIENTS * getTestSampleMessages().size());
         ArrayList<ArrayList<Message>> messagesCalledBack = new ArrayList<>();
-        for (int i = 0; i < NUMBER_OF_CLIENT; i++) {
-            int finalI = i;
-            localQueueBroker.connect(
-                "LocalBroker",
-                1234,
+
+        // Set up the echo server
+        Brokers.remoteQueueBroker.bind(1234, queue -> queue.setListener(new EchoListener()));
+
+        // Initialize each client and connect
+        for (int i = 0; i < NUMBER_OF_CLIENTS; i++) {
+            int clientId = i;
+            Brokers.localQueueBroker.connect(
+                    "RemoteBroker", 1234,
                     queue -> {
                         var callbackGateway = new ArrayList<Message>();
                         messagesCalledBack.add(callbackGateway);
-                        queue.setListener(new ClientListener(finalI, getTestSampleMessages(), callbackGateway));
+                        queue.setListener(new ClientListener(clientId, getTestSampleMessages(), callbackGateway, latch));
+
+                        // Send the first message
+                        queue.send(getTestSampleMessages().getFirst(), new ClientListener(clientId, getTestSampleMessages(), callbackGateway, latch));
                     }
             );
         }
 
-        // Wait until each connection happened
-        for (int i = 0; i < NUMBER_OF_CLIENT; i++) {
-            while (messagesCalledBack.size() < NUMBER_OF_CLIENT) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
-        // Wait until messaging is done
-        for (int i = 0; i < NUMBER_OF_CLIENT; i++) {
-            while (messagesCalledBack.get(i).size() < getTestSampleMessages().size()) {
-                try {
-                    Thread.sleep(10);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
 
-        // Assert
-        for (int i = 0; i < NUMBER_OF_CLIENT; i++) {
-            ArrayList<Message> messages = messagesCalledBack.get(i);
-            for (int j = 0; j < getTestSampleMessages().size(); j++) {
-                Assertions.assertArrayEquals(getTestSampleMessages().toArray(), messages.toArray());
-            }
+        // Wait until all messages have been echoed back or timeout
+        latch.await(5, TimeUnit.SECONDS);
+
+        Brokers.remoteQueueBroker.unbind(1234);
+
+
+        // Doing the checks
+        for (ArrayList<Message> messages : messagesCalledBack) {
+            Assertions.assertArrayEquals(getTestSampleMessages().toArray(), messages.toArray());
         }
     }
 
-
-    // might need to be changed to random message generation later on
     private ArrayList<Message> getTestSampleMessages() {
         ArrayList<Message> messages = new ArrayList<>();
         messages.add(buildMessageFrom("Hello"));
@@ -80,58 +67,57 @@ public class EventQueueEchoTest {
         return messages;
     }
 
-    private Message buildMessageFrom(String message) {
-        return new Message(message.getBytes());
+    private Message buildMessageFrom(String content) {
+        return new Message(content.getBytes());
     }
 }
 
-
 class ClientListener implements MessageQueue.ReadListener, MessageQueue.WriteListener {
 
-    // used for debug
-    private final int N;
+    private final int id;
     private final ArrayList<Message> toSend;
     private final ArrayList<Message> received;
-    // First message is sent from the main program so we start at 1.
-    int indexToWrite = 1;
+    private final CountDownLatch latch;
+    // First message is sent from the on connect so we start at 1.
+    private int indexToWrite = 1;
 
-    ClientListener(int N, ArrayList<Message> toSend, ArrayList<Message> received) {
-        this.N = N;
+    ClientListener(int id, ArrayList<Message> toSend, ArrayList<Message> received, CountDownLatch latch) {
+        this.id = id;
         this.toSend = toSend;
         this.received = received;
+        this.latch = latch;
     }
 
     @Override
     public void received(Message message, MessageQueue queue) {
         received.add(message);
-    }
+        latch.countDown();
 
-    @Override
-    public void closed() {
-        System.out.println("WARNING: The connection was closed.");
-    }
+        System.out.println("Client " + id + " received message: " + new String(message.getBytes()));
 
-    @Override
-    public void written(Message message, MessageQueue queue) {
         if (indexToWrite < toSend.size()) {
             queue.send(toSend.get(indexToWrite), this);
             indexToWrite++;
         }
     }
+
+    @Override
+    public void closed() {
+        System.out.println("Client connection closed.");
+    }
+
+    @Override
+    public void written(Message message, MessageQueue queue) {
+        System.out.println("Message sent: " + new String(message.getBytes()));
+    }
 }
 
 class EchoListener implements MessageQueue.ReadListener, MessageQueue.WriteListener {
 
-    private final MessageQueue queue;
-
-    EchoListener(MessageQueue queue) {
-        this.queue = queue;
-    }
-
     @Override
     public void received(Message message, MessageQueue queue) {
-        // Echoes the received msg
-        queue.send(message, this);
+        System.out.println("Echoing message: " + new String(message.getBytes()));
+        queue.send(message, this);  // Echoes back
     }
 
     @Override
@@ -141,5 +127,6 @@ class EchoListener implements MessageQueue.ReadListener, MessageQueue.WriteListe
 
     @Override
     public void written(Message message, MessageQueue queue) {
+        // Skip
     }
 }

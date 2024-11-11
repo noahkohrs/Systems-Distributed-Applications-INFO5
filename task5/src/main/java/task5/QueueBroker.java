@@ -18,7 +18,7 @@ public abstract class QueueBroker {
     /**
      * The parent broker that created this broker.
      */
-    public final Broker parentBroker;
+    protected final Broker parentBroker;
 
     /**
      * Create a new QueueBroker with the given name.

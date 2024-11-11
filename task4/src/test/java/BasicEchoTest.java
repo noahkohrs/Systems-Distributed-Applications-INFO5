@@ -24,7 +24,7 @@ public class BasicEchoTest {
 
         // Basic wait for the test to happen.
         try {
-            Thread.sleep(100);
+            Thread.sleep(100);  // Increase the wait time to ensure data transfer completes
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -76,6 +76,7 @@ class EchoClient implements Broker.ConnectListener {
 
     private final byte[] bytesToSend;
     private final byte[] receivedBytes;
+    private int sendIndex = 0;
 
     EchoClient(byte[] bytesToSend, byte[] receivedBytes) {
         this.bytesToSend = bytesToSend;
@@ -84,11 +85,17 @@ class EchoClient implements Broker.ConnectListener {
 
     @Override
     public void connected(Channel channel) {
-        for (int i = 0; i < bytesToSend.length; i++) {
-            int finalI = i;
-            channel.write(bytesToSend, i, 1, bytes -> channel.read(receivedBytes, finalI, 1));
-        }
         channel.setListener(new ResultForwarder(receivedBytes));
+        sendNextByte(channel);
+    }
+
+    private void sendNextByte(Channel channel) {
+        if (sendIndex < bytesToSend.length) {
+            channel.write(bytesToSend, sendIndex, 1, bytes -> {
+                sendIndex++;
+                sendNextByte(channel);
+            });
+        }
     }
 
     @Override
@@ -108,7 +115,10 @@ class ResultForwarder implements Channel.ReadListener {
 
     @Override
     public void received(Channel channel) {
-        int length = channel.read(arrival, idx, arrival.length - idx);
-        idx += length;
+        while (idx < arrival.length) {
+            int bytesRead = channel.read(arrival, idx, arrival.length - idx);
+            if (bytesRead <= 0) break;
+            idx += bytesRead;
+        }
     }
 }
