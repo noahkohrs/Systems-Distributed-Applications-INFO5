@@ -2,6 +2,7 @@ package task5;
 
 import com.sun.nio.sctp.MessageInfo;
 import task4.Broker;
+import task4.Channel;
 
 /**
  * A MessagesQueue represents a channel for sending and receiving {@link Message} objects.
@@ -9,6 +10,13 @@ import task4.Broker;
  * Unlike a {@link task4.Channel}, this abstraction works at the message level instead of individual bytes.
  */
 public abstract class MessageQueue {
+
+    protected final Channel channel;
+
+    protected MessageQueue(Channel channel) {
+        this.channel = channel;
+    }
+
     /**
      * Sends a {@link Message} to the remote peer.
      * <br>

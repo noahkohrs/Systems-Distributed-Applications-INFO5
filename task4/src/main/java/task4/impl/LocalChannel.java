@@ -2,7 +2,6 @@ package task4.impl;
 
 import task4.Channel;
 import task4.EventPump;
-import task4.EventTask;
 import task4.utils.CircularBuffer;
 
 import java.util.Arrays;
@@ -10,7 +9,6 @@ import java.util.Arrays;
 public class LocalChannel extends Channel {
 
     boolean isAwareOfChanges = false;
-    boolean hasBeenFullLately = false;
     private boolean connected = true;
     ReadListener readListener;
     private LocalChannel oppositeGateway;
@@ -58,11 +56,12 @@ public class LocalChannel extends Channel {
             bytes[offset + bytesRead] = data.pull();
             bytesRead++;
         }
-        if (hasBeenFullLately) {
-            hasBeenFullLately = false;
-            EventPump.post(new EventTask("Available", () -> oppositeGateway.readListener.available(oppositeGateway)));
-        }
         return bytesRead;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return data.empty();
     }
 
     @Override
