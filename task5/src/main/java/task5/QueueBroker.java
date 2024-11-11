@@ -1,5 +1,7 @@
 package task5;
 
+import task4.Broker;
+
 /**
  * A QueueBroker is a high-level abstraction that manages message-based communication
  * by accepting connections and routing {@link Message} objects between hosts.
@@ -14,14 +16,17 @@ public abstract class QueueBroker {
     public final String name;
 
     /**
-     * Create a new QueueBroker with the given name.
-     * @param name the name of the broker.
+     * The parent broker that created this broker.
      */
-    public QueueBroker(String name) {
-        if (name == null) {
-            throw new IllegalArgumentException("Name cannot be null");
-        }
-        this.name = name;
+    protected final Broker parentBroker;
+
+    /**
+     * Create a new QueueBroker with the given name.
+     * @param broker the Broker it derives from.
+     */
+    public QueueBroker(Broker broker) {
+        this.parentBroker = broker;
+        this.name = broker.name;
     }
 
     /**
@@ -79,6 +84,6 @@ public abstract class QueueBroker {
         /**
          * Called when a connection attempt is refused or fails.
          */
-        void refused();
+        default void refused() {};
     }
 }

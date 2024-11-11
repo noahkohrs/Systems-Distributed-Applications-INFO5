@@ -26,19 +26,18 @@ public abstract class Channel {
          * The callback only happens once after any upcoming write operation
          * happened since last time this event has been received.
          * <br>
-         * The function will never be executed concurrently with other events.
+         * The method will never be executed concurrently with other events.
          *
          * @param channel the {@link Channel} that received the message.
          */
         void received(Channel channel);
-
         /**
          * Called when the {@link Channel} has been closed by the opposite side.
          * <br>
-         * The function will never be executed concurrently with other events.
+         * The method will never be executed concurrently with other events.
          */
-        default void closed() {
-        }
+        default void closed() {}
+
     }
 
     /**
@@ -56,7 +55,7 @@ public abstract class Channel {
          * <br>
          * The function is a callback of the write method.
          * <br>
-         * The function will never be executed concurrently with other events.
+         * The method will never be executed concurrently with other events.
          */
         void written(int bytes);
     }
@@ -83,6 +82,13 @@ public abstract class Channel {
      * @return the number of bytes read.
      */
     public abstract int read(byte[] bytes, int offset, int length);
+
+    /**
+     * Check if the channel is empty.
+     *
+     * @return true if there is nothing to read in the channel, false otherwise.
+     */
+    public abstract boolean isEmpty();
 
     /**
      * Disconnect the channel.

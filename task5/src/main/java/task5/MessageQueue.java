@@ -1,4 +1,5 @@
 package task5;
+import task4.Channel;
 
 /**
  * A MessagesQueue represents a channel for sending and receiving {@link Message} objects.
@@ -7,10 +8,16 @@ package task5;
  */
 public abstract class MessageQueue {
 
+    protected final Channel channel;
+
+    protected MessageQueue(Channel channel) {
+        this.channel = channel;
+    }
+
     /**
      * Sends a {@link Message} to the remote peer.
      * <br>
-     * This is a non-blocking operation that will return immediately, triggering the {@link WriteListener#written(Message)} once the message is fully sent.
+     * This is a non-blocking operation that will return immediately, triggering the {@link WriteListener#written(Message, MessageQueue)} once the message is fully sent.
      *
      * @param message the message to be sent.
      * @param listener the listener to handle the completion of the send operation.
@@ -42,11 +49,12 @@ public abstract class MessageQueue {
          * Called when a new {@link Message} is received.
          *
          * @param message the received message.
+         * @param queue the {@link MessageQueue} that received the message.
          */
-        void received(Message message);
+        void received(Message message, MessageQueue queue);
 
         /**
-         * Called when the connection has been closed by the remote peer.
+         * Called once when the connection has been closed by the opposite peer.
          */
         void closed();
     }
@@ -59,7 +67,8 @@ public abstract class MessageQueue {
          * Called when the {@link Message} has been successfully sent.
          *
          * @param message the message that was sent.
+         * @param queue the {@link MessageQueue} that sent the message.
          */
-        void written(Message message);
+        void written(Message message, MessageQueue queue);
     }
 }

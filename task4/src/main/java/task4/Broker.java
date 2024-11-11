@@ -71,6 +71,6 @@ public abstract class Broker {
          */
         void connected(Channel channel);
 
-        void refused();
+        default void refused() {};
     }
 }

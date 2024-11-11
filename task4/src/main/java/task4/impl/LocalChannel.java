@@ -60,7 +60,13 @@ public class LocalChannel extends Channel {
     }
 
     @Override
+    public boolean isEmpty() {
+        return data.empty();
+    }
+
+    @Override
     public void disconnect() {
+        
         connected = false;
     }
 

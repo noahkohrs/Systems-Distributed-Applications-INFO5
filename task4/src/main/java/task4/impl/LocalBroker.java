@@ -58,8 +58,8 @@ public class LocalBroker extends Broker {
     private synchronized void _accept(LocalBroker otherBroker, int port, ConnectListener listener) {
 
         if (currentBindings.containsKey(port)) {
-            LocalChannel channelConnect = new LocalChannel(otherBroker, 1024);
-            LocalChannel channelAccept = new LocalChannel(this, 1024);
+            LocalChannel channelConnect = new LocalChannel(otherBroker, 3); // making it really low to make the testing harder
+            LocalChannel channelAccept = new LocalChannel(this, 3); // making it really low to make the testing harder
             LocalChannel.linkChannels(channelConnect, channelAccept);
             var taskAccept = new EventTask("Accepted", () -> listener.connected(channelAccept));
             var taskConnect = new EventTask("Connected", () -> currentBindings.get(port).accepted(channelConnect));
