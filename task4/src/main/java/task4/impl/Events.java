@@ -33,6 +33,7 @@ class ClosedEvent extends EventTask {
         super("ReadEvent", () -> {
             receiver.connected = false;
             sender.connected = false;
+            receiver.readListener.closed();
         });
     }
 }
