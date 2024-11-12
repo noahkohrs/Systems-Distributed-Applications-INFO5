@@ -10,8 +10,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(':task1'))
-
+    implementation implementation(project(':kohrsn_task1',))
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 }

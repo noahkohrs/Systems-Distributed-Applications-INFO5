@@ -1,7 +1,5 @@
-rootProject.name = 'INFO5_SAR'
-include 'task1'
-include 'task2'
-include 'task3'
-include 'task4'
-include 'task5'
-
+include 'kohrsn_task1'
+include 'kohrsn_task2'
+include 'kohrsn_task3'
+include 'kohrsn_task4'
+include 'kohrsn_task5'

@@ -3,14 +3,15 @@ plugins {
 }
 
 group = 'com.noahkohrs'
-version = '1.0'
+version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    implementation(project(':task4'))
+    implementation implementation(project(':kohrsn_task1',))
+    implementation implementation(project(':kohrsn_task2',))
 
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
@@ -18,4 +19,5 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    outputs.upToDateWhen {false}
 }
