@@ -19,7 +19,7 @@ class ReaderAutomata implements Channel.ReadListener {
         this.owner = owner;
     }
 
-    public void setListener(MessageQueue.ReadListener listener) {
+    void setListener(MessageQueue.ReadListener listener) {
         this.listener = listener;
     }
 
@@ -43,6 +43,13 @@ class ReaderAutomata implements Channel.ReadListener {
                     currentIndex = 0;
                 }
             }
+        }
+    }
+
+    @Override
+    public void closed() {
+        if (listener != null) {
+            listener.closed();
         }
     }
 

@@ -23,7 +23,7 @@ package info5.sar.utils;
  */
 public class CircularBuffer {
     volatile int m_tail, m_head;
-    volatile byte m_bytes[];
+    volatile byte[] m_bytes;
 
     public CircularBuffer(int capacity) {
         m_bytes = new byte[capacity];
@@ -47,8 +47,7 @@ public class CircularBuffer {
 
     /**
      * @param b: the byte to push in the buffer
-     * @return the next available byte
-     * @throws an IllegalStateException if full.
+     * @throws IllegalStateException if full.
      */
     public void push(byte b) {
         int next = (m_head + 1) % m_bytes.length;

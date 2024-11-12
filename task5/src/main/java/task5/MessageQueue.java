@@ -1,5 +1,4 @@
 package task5;
-import task4.Channel;
 
 /**
  * A MessagesQueue represents a channel for sending and receiving {@link Message} objects.
@@ -8,10 +7,10 @@ import task4.Channel;
  */
 public abstract class MessageQueue {
 
-    protected final Channel channel;
-
-    protected MessageQueue(Channel channel) {
-        this.channel = channel;
+    /**
+     * Default constructor.
+     */
+    protected MessageQueue() {
     }
 
     /**
@@ -19,7 +18,7 @@ public abstract class MessageQueue {
      * <br>
      * This is a non-blocking operation that will return immediately, triggering the {@link WriteListener#written(Message, MessageQueue)} once the message is fully sent.
      *
-     * @param message the message to be sent.
+     * @param message  the message to be sent.
      * @param listener the listener to handle the completion of the send operation.
      * @throws IllegalStateException if the connection is closed or an error occurs while sending.
      */
@@ -49,7 +48,7 @@ public abstract class MessageQueue {
          * Called when a new {@link Message} is received.
          *
          * @param message the received message.
-         * @param queue the {@link MessageQueue} that received the message.
+         * @param queue   the {@link MessageQueue} that received the message.
          */
         void received(Message message, MessageQueue queue);
 
@@ -67,7 +66,7 @@ public abstract class MessageQueue {
          * Called when the {@link Message} has been successfully sent.
          *
          * @param message the message that was sent.
-         * @param queue the {@link MessageQueue} that sent the message.
+         * @param queue   the {@link MessageQueue} that sent the message.
          */
         void written(Message message, MessageQueue queue);
     }

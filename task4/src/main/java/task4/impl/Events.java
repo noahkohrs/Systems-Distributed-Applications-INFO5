@@ -26,3 +26,13 @@ class ReadEvent extends EventTask {
         });
     }
 }
+
+class ClosedEvent extends EventTask {
+
+    public ClosedEvent(LocalChannel receiver, LocalChannel sender) {
+        super("ReadEvent", () -> {
+            receiver.connected = false;
+            sender.connected = false;
+        });
+    }
+}

@@ -6,6 +6,8 @@ import task4.Broker;
  * A QueueBroker is a high-level abstraction that manages message-based communication
  * by accepting connections and routing {@link Message} objects between hosts.
  * <br>
+ * A {@link MessageQueue} is connected at the creation and once closed it remains closed forever.
+ * <br>
  * Unlike a {@link task4.Broker}, which works at the byte level, QueueBroker handles entire messages.
  */
 public abstract class QueueBroker {
@@ -21,7 +23,9 @@ public abstract class QueueBroker {
     protected final Broker parentBroker;
 
     /**
-     * Create a new QueueBroker with the given name.
+     * Create a new QueueBroker derived from the given Broker.
+     * The QueueBroker will retain the name of the parent Broker.
+     *
      * @param broker the Broker it derives from.
      */
     public QueueBroker(Broker broker) {
@@ -31,10 +35,11 @@ public abstract class QueueBroker {
 
     /**
      * Binds to a given port and starts listening for incoming connections.
+     * This method has to be called before any incoming connections can be accepted.
      * <br>
      * The method will return immediately and call the {@link AcceptListener#accepted(MessageQueue)} when a connection is established.
      *
-     * @param port the port to bind and listen for incoming connections.
+     * @param port     the port to bind and listen for incoming connections.
      * @param listener the listener to handle newly accepted connections.
      * @throws IllegalStateException if the port is already in use or cannot be bound.
      */
@@ -49,11 +54,12 @@ public abstract class QueueBroker {
 
     /**
      * Connects to a remote host on the given port and establishes a message queue.
+     * The host must have a {@link QueueBroker} already bound to the given port to accept the connection.
      * <br>
      * This method is non-blocking and will return immediately, triggering the {@link ConnectListener#connected(MessageQueue)} upon success.
      *
-     * @param host the remote host to connect to.
-     * @param port the port to connect to.
+     * @param host     the remote host to connect to.
+     * @param port     the port to connect to.
      * @param listener the listener to handle the connection event.
      */
     public abstract void connect(String host, int port, ConnectListener listener);
@@ -84,6 +90,6 @@ public abstract class QueueBroker {
         /**
          * Called when a connection attempt is refused or fails.
          */
-        default void refused() {};
+        default void refused() {}
     }
 }

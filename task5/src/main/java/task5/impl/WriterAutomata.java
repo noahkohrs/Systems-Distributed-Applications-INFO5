@@ -7,7 +7,7 @@ import task5.MessageQueue;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class WriterAutomata implements Channel.WriteListener {
+class WriterAutomata implements Channel.WriteListener {
 
     private final MessageQueue owner;
     private final Channel channel;
@@ -18,7 +18,7 @@ public class WriterAutomata implements Channel.WriteListener {
     private Message currentMessage = null;
     private State state = State.WAITING_FOR_NEXT;
 
-    public WriterAutomata(MessageQueue owner, Channel channel) {
+    WriterAutomata(MessageQueue owner, Channel channel) {
         this.owner = owner;
         this.channel = channel;
     }

@@ -4,13 +4,19 @@ import task4.Channel;
 import task5.Message;
 import task5.MessageQueue;
 
-public class MessageQueueImpl extends MessageQueue {
+/**
+ * An implementation of the {@link MessageQueue} abstract working on top of a {@link Channel}.
+ */
+public final class MessageQueueImpl extends MessageQueue {
+
+    private final Channel channel;
 
     private final ReaderAutomata readerAutomata;
     private final WriterAutomata writerAutomata;
 
-    public MessageQueueImpl(Channel channel) {
-        super(channel);
+    MessageQueueImpl(Channel channel) {
+        super();
+        this.channel = channel;
         readerAutomata = new ReaderAutomata(this);
         writerAutomata = new WriterAutomata(this, channel);
         channel.setListener(readerAutomata);

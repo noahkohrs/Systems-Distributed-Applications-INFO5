@@ -1,24 +1,34 @@
 package task5;
 
-
 /**
  * A message is a byte array that can be sent through a {@link MessageQueue}.
  * <br>
  * Warning: the {@code bytes} array is the only field which will be written when sent to the message queue.
  */
 public class Message {
+
+    /**
+     * The message content.
+     */
     protected byte[] bytes;
 
     /**
-     * Constructs a new {@code EventMessage} with the specified byte array.
+     * Constructs a new {@code EventMessage} with the specified byte array starting from the given {@code offset} and with the given {@code length}.
      *
-     * @param bytes the byte array to be sent
+     * @param bytes  the content
+     * @param offset the start index
+     * @param length the length of the content
      */
     public Message(byte[] bytes, int offset, int length) {
         this.bytes = new byte[length];
         System.arraycopy(bytes, offset, this.bytes, 0, length);
     }
 
+    /**
+     * Constructs a new {@code EventMessage} with the specified byte array.
+     *
+     * @param bytes the content
+     */
     public Message(byte[] bytes) {
         this(bytes, 0, bytes.length);
     }
@@ -59,10 +69,20 @@ public class Message {
         return new String(bytes);
     }
 
+    /**
+     * Delivers the content of the message.
+     *
+     * @return the byte array
+     */
     public byte[] getBytes() {
         return bytes;
     }
 
+    /**
+     * Delivers the length of the byte array.
+     *
+     * @return the length of the byte array
+     */
     public int getLength() {
         return bytes.length;
     }

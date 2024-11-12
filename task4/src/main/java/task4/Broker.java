@@ -38,6 +38,11 @@ public abstract class Broker {
      */
     public abstract void bind(int port, AcceptListener listener);
 
+    /**
+     * Stop listening on the given port and unbind any connections associated with it.
+     *
+     * @param port the port to unbind.
+     */
     public abstract void unbind(int port);
 
     public interface AcceptListener {
@@ -53,6 +58,7 @@ public abstract class Broker {
 
     /**
      * Connect to a remote host on the given port.
+     * The method will only be successful if the remote host has a {@link Broker} that is bound to the given port.
      * <br>
      * This is a non-blocking operation, it will return immediately.
      *
@@ -64,13 +70,20 @@ public abstract class Broker {
     public interface ConnectListener {
         /**
          * Called when a connection by the {@link Channel} is successfully established.
+         * This is an outcome of a successful {@link Broker#connect(String, int, ConnectListener)} call.
          * <br>
          * The function will never be executed concurrently with other events.
          *
-         * @param channel the connected
+         * @param channel the connected {@link Channel}
          */
         void connected(Channel channel);
 
-        default void refused() {};
+        /**
+         * Called when the connection is refused by the remote host.
+         * This is an outcome of a failed {@link Broker#connect(String, int, ConnectListener)} call.
+         * <br>
+         * The function will never be executed concurrently with other events.
+         */
+        default void refused() {}
     }
 }

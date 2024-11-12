@@ -4,10 +4,13 @@ import task4.Broker;
 import task4.Channel;
 import task5.QueueBroker;
 
-public class QueueBrokerImpl extends QueueBroker {
+/**
+ * An implementation of the {@link QueueBroker} abstract working on top of a {@link Broker}.
+ */
+public final class QueueBrokerImpl extends QueueBroker {
 
     /**
-     * Create a new QueueBroker with the given name.
+     * Create a new QueueBroker that derives from the given Broker.
      *
      * @param broker the Broker it derives from.
      */

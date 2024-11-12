@@ -9,7 +9,7 @@ import java.util.Arrays;
 public class LocalChannel extends Channel {
 
     boolean isAwareOfChanges = false;
-    private boolean connected = true;
+    boolean connected = true;
     ReadListener readListener;
     private LocalChannel oppositeGateway;
     private final CircularBuffer data;
@@ -66,8 +66,7 @@ public class LocalChannel extends Channel {
 
     @Override
     public void disconnect() {
-        
-        connected = false;
+        EventPump.post(new ClosedEvent(this, this.oppositeGateway));
     }
 
     @Override
