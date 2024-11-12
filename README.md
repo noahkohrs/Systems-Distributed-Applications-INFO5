@@ -53,7 +53,7 @@ Une [API Reference](https://noahkohrs.github.io/Systems-Distributed-Applications
 Elle est accessible à ce lien : https://noahkohrs.github.io/Systems-Distributed-Applications-INFO5/
 
 ## Auteurs
-- [Noah Kohrs]() **Toute la codebase**
-- [Anastasios Tsiompanidis]() **Travail de groupe sur la tâche 5**
-- [Thibaut Haberer]() **Travail de groupe sur la tâche 5**
-- [Noé Fléchon]() **Travail de groupe sur la tâche 5**
+- [Noah Kohrs](https://github.com/noahkohrs) **Toute la codebase**
+- [Anastasios Tsiompanidis](https://github.com/AnastasiosTsio) **Travail de groupe sur la tâche 5**
+- [Thibaut Haberer](https://github.com/ThibHab) **Travail de groupe sur la tâche 5**
+- [Noé Fléchon](https://github.com/flechonn) **Travail de groupe sur la tâche 5**
