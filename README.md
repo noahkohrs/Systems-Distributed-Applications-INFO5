@@ -48,6 +48,13 @@ Lancer les tests d'une tâche spécifique :
 ```
 (où X est le numéro de la tâche)
 
+## Design
+Design du projet:
+- en noir pour la task4
+- en violet la task5
+
+![design](/design.jpg)
+
 ## Documentation
 Une [API Reference](https://noahkohrs.github.io/Systems-Distributed-Applications-INFO5/) est disponible pour la tâche 5 (soit le projet de groupe) et est générée avec Javadoc.
 Elle est accessible à ce lien : https://noahkohrs.github.io/Systems-Distributed-Applications-INFO5/
