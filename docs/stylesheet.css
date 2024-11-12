@@ -14,8 +14,8 @@
     --block-font-family: 'DejaVu Serif', Georgia, "Times New Roman", Times, serif;
     --code-font-family: 'DejaVu Sans Mono', monospace;
     /* Base font sizes for body and code elements */
-    --body-font-size: 14px;
-    --code-font-size: 14px;
+    --body-font-size: 16px;
+    --code-font-size: 16px;
     /* Text colors for body and block elements */
     --body-text-color: #353833;
     --block-text-color: #474747;
