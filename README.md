@@ -61,6 +61,6 @@ Elle est accessible à ce lien : https://noahkohrs.github.io/Systems-Distributed
 
 ## Auteurs
 - [Noah Kohrs](https://github.com/noahkohrs) **Toute la codebase**
-- [Anastasios Tsiompanidis](https://github.com/AnastasiosTsio) **Travail de groupe sur la tâche 5**
-- [Thibaut Haberer](https://github.com/ThibHab) **Travail de groupe sur la tâche 5**
-- [Noé Fléchon](https://github.com/flechonn) **Travail de groupe sur la tâche 5**
+- [Anastasios Tsiompanidis](https://github.com/AnastasiosTsio) **Travail de groupe sur la tâche 4 et 5**
+- [Thibaut Haberer](https://github.com/ThibHab) **Travail de groupe sur la tâche 4 et 5**
+- [Noé Fléchon](https://github.com/flechonn) **Travail de groupe sur la tâche 4 et 5**
